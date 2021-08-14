@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Session 4: Word frequencies and visualization</title>
+
+<script src="site_libs/header-attrs-2.9/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/clipboard-1.7.1/clipboard.min.js"></script>
+<link href="site_libs/primer-tooltips-1.4.0/build.css" rel="stylesheet" />
+<link href="site_libs/klippy-0.0.0.9500/css/klippy.min.css" rel="stylesheet" />
+<script src="site_libs/klippy-0.0.0.9500/js/klippy.min.js"></script>
+<script src="site_libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<link href="site_libs/wordcloud2-0.0.1/wordcloud.css" rel="stylesheet" />
+<script src="site_libs/wordcloud2-0.0.1/wordcloud2-all.js"></script>
+<script src="site_libs/wordcloud2-0.0.1/hover.js"></script>
+<script src="site_libs/wordcloud2-binding-0.2.1/wordcloud2.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Overview
+  </a>
+</li>
+<li>
+  <a href="schedule.html">
+    <span class="fa fa-info"></span>
+     
+    Schedule
+  </a>
+</li>
+<li>
+  <a href="1_RBasics.html">
+    <span class="fa fa-book"></span>
+     
+    Session 1
+  </a>
+</li>
+<li>
+  <a href="2_ScrapingAndReadingInDocuments.html">
+    <span class="fa fa-book"></span>
+     
+    Session 2
+  </a>
+</li>
+<li>
+  <a href="3_CleaningAndManipulating.html">
+    <span class="fa fa-book"></span>
+     
+    Session 3
+  </a>
+</li>
+<li>
+  <a href="4_WordFreq.html">
+    <span class="fa fa-book"></span>
+     
+    Session 4
+  </a>
+</li>
+<li>
+  <a href="5_SentAndDict.html">
+    <span class="fa fa-book"></span>
+     
+    Session 5
+  </a>
+</li>
+<li>
+  <a href="6_DocSimil.html">
+    <span class="fa fa-book"></span>
+     
+    Session 6
+  </a>
+</li>
+<li>
+  <a href="7_topicmodelling.html">
+    <span class="fa fa-book"></span>
+     
+    Session 7
+  </a>
+</li>
+<li>
+  <a href="8_WordEmbedding.html">
+    <span class="fa fa-book"></span>
+     
+    Session 8
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Session 4: Word frequencies and visualization</h1>
+
+</div>
+
+
+<script>
+  addClassKlippyTo("pre.r, pre.markdown");
+  addKlippy('right', 'top', 'auto', '1', 'Copy code', 'Copied!');
+</script>
+<div id="tidy-corpus-form" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Tidy corpus form</h1>
+<p>We’ve talked about tidy format – each variable a column, each observation a row, each type of observational unit a table. We’ve taken speeches at the Nobel prize and pages of oil company Sustainability Reports as our observations and can use this to do some transformations – do total word counts or specific word frequencies. But once we start really doing analysis at the level of the word, tidy rules would seem to dictate that we treat not individual texts but individual <em>words</em> as observations. Thus tidytext format is a table with one word per row.</p>
+<p>It might help if we are more specific: we can use two signifiers for words - words and tokens. Words are unique, well, words as we conceive of them. Tokens are each individual instances of a word. So a sentence: “the brown fox jumped over the brown log” we will say has 8 tokens (number of total words) but 6 words (number of unique words, as “the” and “brown” appear twice).<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> So tidy data format is <em>one token per row</em>.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
+<p>We convert character strings that we have been working with into tidy text with the <code>unnest_rows()</code> function in the <code>tidytext package</code>, which splits texts up by tokens (a process appropriately called “tokenization”).</p>
+<pre class="r"><code># Lets use the first speach in our Nobel corpus as an example
+library(tidytext)
+library(tidyverse)
+nobel &lt;- read_rds(&quot;data/nobel_cleaned.Rds&quot;)
+ex &lt;- nobel[1,]
+ex %&gt;%
+  unnest_tokens(output = words, input = AwardSpeech)</code></pre>
+<pre><code>## # A tibble: 598 x 3
+##     Year Laureate           words       
+##    &lt;dbl&gt; &lt;chr&gt;              &lt;chr&gt;       
+##  1  1905 Bertha von Suttner on          
+##  2  1905 Bertha von Suttner behalf      
+##  3  1905 Bertha von Suttner of          
+##  4  1905 Bertha von Suttner the         
+##  5  1905 Bertha von Suttner nobel       
+##  6  1905 Bertha von Suttner committee   
+##  7  1905 Bertha von Suttner bjørnstjerne
+##  8  1905 Bertha von Suttner bjørnson    
+##  9  1905 Bertha von Suttner introduced  
+## 10  1905 Bertha von Suttner the         
+## # ... with 588 more rows</code></pre>
+<p>We now end up with a dataframe where each row is an observation with words, year, and Nobel laureate as variables. Note also that <code>tidytext</code> does cleaning - whitespace stripping, to_lower and so on. We didn’t notice here as we’re using our dataframe that we have already cleaned. The first thing we might notice is the number of rows is the total word count.</p>
+</div>
+<div id="stop-words" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Stop Words</h1>
+<p>Another way in which texts are frequently pre-processed for analysis and we can now look at is to remove so-called stop words. Stop words are words with grammatical rather than syntactic function - they make things we say grammatical but don’t add (much) meaning. Examples include “a,” “the,” “of” and so on. What counts as a stopword might vary on our corpus! And what sort of analysis we’re trying to do.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> All major text analysis packages have means for removing stop words. In ‘’tidytext’’ we have a list of stopwords called <code>stop_words</code> from a couple of different corpora (<code>?stop_words</code> for more info and links).</p>
+<pre class="r"><code>stop_words</code></pre>
+<pre><code>## # A tibble: 1,149 x 2
+##    word        lexicon
+##    &lt;chr&gt;       &lt;chr&gt;  
+##  1 a           SMART  
+##  2 a&#39;s         SMART  
+##  3 able        SMART  
+##  4 about       SMART  
+##  5 above       SMART  
+##  6 according   SMART  
+##  7 accordingly SMART  
+##  8 across      SMART  
+##  9 actually    SMART  
+## 10 after       SMART  
+## # ... with 1,139 more rows</code></pre>
+<pre class="r"><code>nobel_tidy &lt;- nobel %&gt;%
+  unnest_tokens(output = words, input = AwardSpeech) %&gt;%
+  anti_join(stop_words, by = c(&quot;words&quot; = &quot;word&quot;))  # by= specifies which columns to use, had they been named the same thing we could have omitted it</code></pre>
+<p><code>stop_words</code>, we’ll recall, is a tibble, so we can easily make our own tibble of stopwords and add it. Say (for purposes of demonstration) I think that the Peace Prize award ceremony is, of course, going to talk about peace and war so we want to weed these words out of our frequency counts.</p>
+<pre class="r"><code>my_words &lt;- c(&quot;peace&quot;, &quot;war&quot;)
+custom_stop_words &lt;- tibble(word = my_words, lexicon = &quot;my_customization&quot;)
+stop_words_custom &lt;- rbind(stop_words, custom_stop_words)
+tail(stop_words_custom) # view the end of the tibble, look like our words were added correctly</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   word     lexicon         
+##   &lt;chr&gt;    &lt;chr&gt;           
+## 1 younger  onix            
+## 2 youngest onix            
+## 3 your     onix            
+## 4 yours    onix            
+## 5 peace    my_customization
+## 6 war      my_customization</code></pre>
+<p>Now we can apply the <code>stop_words_custom</code> just like we did <code>stop_words</code>. We won’t actually do this because we probably want these words in the corpus!</p>
+</div>
+<div id="stemming" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Stemming</h1>
+<p>If we are looking at word frequencies, will we want to count “represent” and “represented” as the same word? Or “war” and “wars?” Very likely. If so we can transform our text via a process called stemming, cutting down words to their stems so that different forms of these word are recognized as being the same thing. Something like this matters in English but might really matter in an more highly inflected language like Russian.</p>
+<p>We have a couple stemmers to choose from in R, one and the best known is the Porter Stemming <a href="https://tartarus.org/martin/PorterStemmer/">algorithm</a>. Another is <a href="https://docs.ropensci.org/hunspell/articles/intro.html">hunspell</a>, based on the popular open source and multilingual spell checker. We’ll use Porter here.</p>
+<p>To see it in action we’ll first test it against a short test set of words and then apply to our whole corpus.</p>
+<pre class="r"><code>library(SnowballC)
+words_to_stem &lt;- c(&quot;going&quot;, &quot;represented&quot;, &quot;wars&quot;, &quot;similarity&quot;, &quot;books&quot;)
+SnowballC::wordStem(words_to_stem)</code></pre>
+<pre><code>## [1] &quot;go&quot;      &quot;repres&quot;  &quot;war&quot;     &quot;similar&quot; &quot;book&quot;</code></pre>
+<p>Stemming in action. So now applied to the entire document:</p>
+<pre class="r"><code>(nobel_tidy_stemmed &lt;- nobel_tidy %&gt;%
+  mutate(word_stem = wordStem(words)))</code></pre>
+<pre><code>## # A tibble: 94,107 x 4
+##     Year Laureate           words        word_stem  
+##    &lt;dbl&gt; &lt;chr&gt;              &lt;chr&gt;        &lt;chr&gt;      
+##  1  1905 Bertha von Suttner behalf       behalf     
+##  2  1905 Bertha von Suttner nobel        nobel      
+##  3  1905 Bertha von Suttner committee    committe   
+##  4  1905 Bertha von Suttner bjørnstjerne bjørnstjern
+##  5  1905 Bertha von Suttner bjørnson     bjørnson   
+##  6  1905 Bertha von Suttner introduced   introduc   
+##  7  1905 Bertha von Suttner speaker      speaker    
+##  8  1905 Bertha von Suttner baroness     baro       
+##  9  1905 Bertha von Suttner bertha       bertha     
+## 10  1905 Bertha von Suttner von          von        
+## # ... with 94,097 more rows</code></pre>
+<pre class="r"><code>write_rds(nobel_tidy_stemmed, &quot;data/nobel_stemmed.Rds&quot;)</code></pre>
+</div>
+<div id="top-word-frequencies" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Top word frequencies<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></h1>
+<p>Now we can find the most frequently appearing words in the corpus.</p>
+<pre class="r"><code>nobel_tidy %&gt;%
+  count(words, sort=TRUE)</code></pre>
+<pre><code>## # A tibble: 12,329 x 2
+##    words             n
+##    &lt;chr&gt;         &lt;int&gt;
+##  1 peace          1595
+##  2 war             927
+##  3 world           847
+##  4 prize           646
+##  5 nations         642
+##  6 nobel           597
+##  7 international   530
+##  8 people          513
+##  9 time            441
+## 10 human           440
+## # ... with 12,319 more rows</code></pre>
+<p>Remember we got this nice and informative result only because we already removed the stopwords. OTherwise we would have been swamped with “the,” “and,” and so on.</p>
+<p>Our knowledge of how to subset tibbles will now come in pretty handy. If we want to get the most frequent words, say, before 1945 we easily do this.</p>
+<pre class="r"><code>nobel_tidy %&gt;%
+  filter(Year &lt; 1945) %&gt;%
+  count(words, sort=TRUE)</code></pre>
+<pre><code>## # A tibble: 4,801 x 2
+##    words             n
+##    &lt;chr&gt;         &lt;int&gt;
+##  1 peace           346
+##  2 war             301
+##  3 nations         193
+##  4 international   157
+##  5 league          145
+##  6 world           110
+##  7 time             81
+##  8 american         72
+##  9 prize            72
+## 10 europe           69
+## # ... with 4,791 more rows</code></pre>
+<p>And we could then compare it to post-1945 word frequency and we’d see pre-WWII prize speeches were more concentrated on Europe, the League, and nations while after that we get more talk of world, people, human, committee. That makes sense.</p>
+<p>Let’s graph this.</p>
+<pre class="r"><code>nobel_tidy %&gt;%
+  count(words, sort=TRUE) %&gt;%
+  top_n(15) %&gt;%                     # selecting to show only top 15 words
+  mutate(words = reorder(words,desc(n))) %&gt;%  # this will ensure that the highest frequency words appear to the left
+  ggplot(aes(words, n)) +
+    geom_col()</code></pre>
+<pre><code>## Selecting by n</code></pre>
+<p><img src="4_WordFreq_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>And with just a little bit more code we can view pre-1945 and post-1945 top frequency words at the same time.</p>
+<pre class="r"><code>nobel_tidy %&gt;%
+  mutate(Period = ifelse(Year &lt;= 1945, &quot;Pre-WWII&quot;, &quot;Post-WWII&quot;)) %&gt;%   # creating columns with label &quot;Pre-WWII&quot; and &quot;Post-WWII&quot;
+  mutate(Period = factor(Period, levels = c(&quot;Pre-WWII&quot;, &quot;Post-WWII&quot;))) %&gt;%
+  group_by(Period) %&gt;%                                                # grouping by this column label so frequencies will be                                                                              calculated within group
+  count(words, sort=TRUE) %&gt;%
+  mutate(proportion = n / sum(n) * 1000) %&gt;%                     # perhaps we&#39;d like word frequency per 1000 words rather than raw                                                                      counts?
+  slice_max(order_by=proportion, n = 15) %&gt;%                     # selecting to show only top 15 words within each group
+  ggplot(aes(reorder_within(x = words, by = proportion, within = Period), proportion, fill = Period)) +    # reordering is a bit tricky, see                                                                                                     ?reorder_within()
+    geom_col() +
+    scale_x_reordered() +
+    coord_flip() +
+    facet_wrap(~Period, ncol = 2, scales = &quot;free&quot;) +
+  xlab(&quot;Word&quot;)</code></pre>
+<p><img src="4_WordFreq_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<div id="word-clouds" class="section level2" number="4.1">
+<h2 number="4.1"><span class="header-section-number">4.1</span> Word Clouds</h2>
+<p>One common visualization of word frequency is word clouds. To do this we use the package wordcloud which will work very nicely with our tidily organized data. Wordcloud2 gives color and more fancy options that you can also play with.</p>
+<pre class="r"><code>library(wordcloud)</code></pre>
+<pre><code>## Loading required package: RColorBrewer</code></pre>
+<pre class="r"><code>library(wordcloud2)
+nobel_tidy %&gt;%
+  count(words, sort=TRUE) %&gt;%
+  with(wordcloud(words, n, max.words = 100))</code></pre>
+<p><img src="4_WordFreq_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>dat &lt;- nobel_tidy %&gt;%
+  count(words, sort=TRUE) %&gt;%
+  mutate(word = words) %&gt;%
+  mutate(freq = n) %&gt;%
+  select(word, freq) %&gt;%
+  top_n(200)</code></pre>
+<pre><code>## Selecting by freq</code></pre>
+<pre class="r"><code>wordcloud2(dat, size = 2)</code></pre>
+<div id="htmlwidget-e7735d91235475e570ed" style="width:672px;height:480px;" class="wordcloud2 html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e7735d91235475e570ed">{"x":{"word":["peace","war","world","prize","nations","nobel","international","people","time","human","countries","committee","united","rights","political","life","nuclear","country","norwegian","league","weapons","president","europe","government","women","refugees","future","organization","social","hope","economic","national","efforts","policy","american","struggle","disarmament","awarded","award","words","conflict","means","day","history","agreement","conference","freedom","south","africa","power","year's","security","support","peaceful","secretary","children","development","union","cooperation","germany","live","violence","called","office","opinion","spirit","situation","difficult","task","east","european","military","movement","respect","society","arms","conditions","force","law","democracy","france","minister","powers","america","foreign","form","position","public","declaration","free","common","forces","result","found","wars","fight","idea","parties","set","french","justice","hand","laureate","population","process","contribution","governments","question","assembly","established","mankind","solution","council","organizations","politics","true","community","million","active","soviet","speech","treaty","negotiations","individual","1","aid","alfred","british","german","achieved","fear","based","relations","sense","carried","importance","responsibility","system","gentlemen","view","1945","action","conflicts","brought","civil","goal","held","ladies","plan","prisoners","reconciliation","ideas","living","received","basis","west","2","born","personal","race","times","achieve","age","created","fundamental","lead","4","geneva","laureates","nobel's","party","reason","strong","bring","father","peoples","progress","convention","nation","period","major","practical","reality","cross","faith","led","principles","step","african","attitude","campaign","courage","global","home","labor","mind","prevent","prime","road","special"],"freq":[1595,927,847,646,642,597,530,513,441,440,435,399,382,357,320,307,278,277,261,246,215,208,206,197,195,194,184,177,176,170,168,166,165,165,164,161,158,151,149,142,139,136,135,135,134,134,133,133,131,130,128,127,122,121,121,120,120,120,118,118,117,117,115,114,114,113,112,111,111,110,106,106,106,105,104,103,102,102,101,99,98,98,98,97,96,96,95,94,93,93,92,92,92,91,91,90,90,90,90,89,89,88,88,88,88,86,86,86,85,85,85,85,84,84,84,84,83,83,82,82,82,82,80,79,78,78,78,78,78,77,77,76,76,76,75,75,75,75,73,73,72,72,72,71,71,71,71,71,71,71,70,69,69,69,68,68,67,67,67,67,67,66,66,66,66,66,65,65,65,65,65,65,65,64,64,64,64,63,63,63,62,62,62,61,61,61,61,61,60,60,60,60,60,60,60,60,60,60,60,60],"fontFamily":"Segoe UI","fontWeight":"bold","color":"random-dark","minSize":0,"weightFactor":0.225705329153605,"backgroundColor":"white","gridSize":0,"minRotation":-0.785398163397448,"maxRotation":0.785398163397448,"shuffle":true,"rotateRatio":0.4,"shape":"circle","ellipticity":0.65,"figBase64":null,"hover":null},"evals":[],"jsHooks":{"render":[{"code":"function(el,x){\n                        console.log(123);\n                        if(!iii){\n                          window.location.reload();\n                          iii = False;\n\n                        }\n  }","data":null}]}}</script>
+<p>It’s also possible to do word clouds that compare two documents. To do this we’ll need to step outside the tidyverse and organize our data in other formats so we save this for Session 5.</p>
+</div>
+</div>
+<div id="tf-idf" class="section level1" number="5">
+<h1 number="5"><span class="header-section-number">5</span> TF-IDF</h1>
+<p>As we’ve seen, there are multiple ways to calculate frequency – we can take raw counts, or term frequency (<span class="math inline">\(tf\)</span>). Proportions, term frequency divided by total token count in a given document, are another means. Certainly proportions make it easier to compare across corpora of different size. The problem with this is that they tend to get flooded with stopwords. One means of dealing with this is to remove the stopwords as we have done, but another is to attempt to downweigh words that appear often everywhere and upweigh those that are more unusual. Inverse document frequency (<span class="math inline">\(idf\)</span>) is a weighting system to do this – it equals the total number of documents in the corpus divided by the number of documents in the corpus that contain the given word. The greater the number of documents in the corpus in which the word does <em>not</em> appear (suggesting words that are unique to certain documents rather than widespread across the corpus as a whole) the smaller the denominator and, thus, the greater the ratio.</p>
+<p>TF-IDF is is term frequency times inverse document frequency. Both are often logged. In symbols,</p>
+<p><span class="math display">\[\begin{equation}
+   \text{TF}_{t,d} =
+ \begin{cases}
+   1 + \text{log}_{10} \: \text{count(t,d)}, &amp; \text{if count(t,d)} &gt; 0 \\
+   0,&amp;\text{otherwise.}\\
+ \end{cases}
+ \end{equation}\]</span></p>
+<p><span class="math display">\[\begin{equation}
+   \text{IDF}_{t} = \text{log}_{10} \: \bigg(\frac{N}{\text{df}_t}\bigg).
+ \end{equation}\]</span></p>
+<p>where t is the given term, d is a given document, df<span class="math inline">\(_t\)</span> is the number of documents in the corpus containing term t, and N is the total number of documents in the corpus. Long story short, tf-idf attempts to weight words by both frequency in an individual document and their unusualness over a corpus of documents. Every word in every document will have its own tf-idf (term frequency will vary across documents while inverse document frequency is the same across the corpus).</p>
+<p>Let’s see how we do this in R. First we’ll compute document frequency. In order to simplify results, lets use the same subsetting of our data into pre-1945 and post-1945 – this means we’re treating pre-WWII speeches as one single document and likewise post-1945 speeches. <code>tidytext</code> makes it pretty easy – simply unnest tokens and then count the tokens. Note that <code>count</code> enable counting within groups, which we passed to <code>count</code> telling it to do the counts within the groups denoted in column <code>Period</code>. This produces the same result as passing <code>group_by(Period)</code> in the previous line and eliminating <code>Period</code> from the <code>count()</code> call.</p>
+<pre class="r"><code>nobel &lt;- read_rds(&quot;data/nobel_cleaned.Rds&quot;) %&gt;%
+  mutate(Period = ifelse(Year &lt;= 1945, &quot;Pre-WWII&quot;, &quot;Post-WWII&quot;))
+nobel_words &lt;- nobel %&gt;%
+  unnest_tokens(words, AwardSpeech) %&gt;%
+  count(words, Period, sort = TRUE)</code></pre>
+<p>We can then use <code>bind_tf_idf()</code> from tidytext. (Tidytext implements tf-idf using proportional, but not logged, tf – we’ll see some of these other versions in other packages). The function takes a first argument (other than the tidy dataframe) that is the word, a second that is the document, and third a column containing document-term counts).</p>
+<pre class="r"><code>tf_idf &lt;- nobel_words %&gt;%
+  bind_tf_idf(words, Period, n)
+tf_idf</code></pre>
+<pre><code>## # A tibble: 17,036 x 6
+##    words Period        n     tf   idf tf_idf
+##    &lt;chr&gt; &lt;chr&gt;     &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+##  1 the   Post-WWII 13947 0.0742     0      0
+##  2 of    Post-WWII  7281 0.0387     0      0
+##  3 in    Post-WWII  5614 0.0299     0      0
+##  4 to    Post-WWII  5591 0.0297     0      0
+##  5 and   Post-WWII  5417 0.0288     0      0
+##  6 a     Post-WWII  3712 0.0197     0      0
+##  7 the   Pre-WWII   3526 0.0761     0      0
+##  8 that  Post-WWII  2543 0.0135     0      0
+##  9 is    Post-WWII  2329 0.0124     0      0
+## 10 of    Pre-WWII   2191 0.0473     0      0
+## # ... with 17,026 more rows</code></pre>
+<p>Here we see that tf-idf has zeroed out these extremely common and not very interesting terms, precisely what we’d hope an indicator like this would do. Lets see the highest tf-idf scores.</p>
+<pre class="r"><code>tf_idf %&gt;% arrange(desc(tf_idf)) </code></pre>
+<pre><code>## # A tibble: 17,036 x 6
+##    words    Period        n       tf   idf   tf_idf
+##    &lt;chr&gt;    &lt;chr&gt;     &lt;int&gt;    &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+##  1 nuclear  Post-WWII   278 0.00148  0.693 0.00102 
+##  2 saavedra Pre-WWII     22 0.000475 0.693 0.000329
+##  3 locarno  Pre-WWII     20 0.000432 0.693 0.000299
+##  4 angell   Pre-WWII     19 0.000410 0.693 0.000284
+##  5 pan      Pre-WWII     19 0.000410 0.693 0.000284
+##  6 ladies   Post-WWII    71 0.000378 0.693 0.000262
+##  7 global   Post-WWII    60 0.000319 0.693 0.000221
+##  8 non      Post-WWII    54 0.000287 0.693 0.000199
+##  9 poverty  Post-WWII    52 0.000277 0.693 0.000192
+## 10 persons  Post-WWII    51 0.000271 0.693 0.000188
+## # ... with 17,026 more rows</code></pre>
+<pre class="r"><code>tf_idf %&gt;%
+  mutate(Period = factor(Period, levels = c(&quot;Pre-WWII&quot;, &quot;Post-WWII&quot;))) %&gt;%
+  group_by(Period) %&gt;%
+  slice_max(tf_idf, n = 15) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(tf_idf, fct_reorder(words, tf_idf), fill = Period)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~Period, ncol = 2, scales = &quot;free&quot;) +
+  labs(x = &quot;tf-idf&quot;, y = NULL)</code></pre>
+<p><img src="4_WordFreq_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>Many of these are names, logically enough as specific names of laureates appear mostly only when they are being awarded a prize thus increasing their idf and upweighing their tf-idf. To make this more useful we’d want to go through and week out (remove, just like stopwords) names. But still we see nuclear coming to the fore in the post-war era, reasonably enough! Things like “global,” “poverty” stand out post-war while pre-war we see “reparations,” “commercial,” more Europe specific vocabulary. A different conversation pre- and post-war.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-mosteller_inference_1963" class="csl-entry">
+Mosteller, Frederick, and David L. Wallace. 1963. <span>“Inference in an <span>Authorship</span> <span>Problem</span>.”</span> <em>Journal of the American Statistical Association</em> 58 (302): 275. <a href="https://doi.org/10.2307/2283270">https://doi.org/10.2307/2283270</a>.
+</div>
+<div id="ref-silge2017text" class="csl-entry">
+Silge, Julia, and David Robinson. 2017. <em>Text Mining with <span>R</span>: A Tidy Approach</em>. "O’Reilly Media, Inc.". <a href="https://www.tidytextmining.com/">https://www.tidytextmining.com/</a>.
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>We could also start talking about tokens and words being not just things we’d recognize as words but things like :) and so on.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>We will also later talk about n-grams where we might take tokens to be 2-grams, sentences or even longer pieces of text.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Interestingly, one of the most famous cases of computational text analysis in the social science – Mosteller and Wallace’s attribution of anonymously published Federalist papers – analyzed stopwords and threw out everything else (<span class="citation">Mosteller and Wallace (1963)</span>).<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>This section and the next lean heavily on chapters 1 and 3 in <span class="citation">Silge and Robinson (2017)</span><a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+
+<br><br><p>2021. <a href="mailto: gregory.fergusoncradler@inn.no">gregory.fergusoncradler@inn.no</a></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

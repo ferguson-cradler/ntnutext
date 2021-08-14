@@ -1,0 +1,156 @@
+---
+title: "Session 7: Topic modeling"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+---
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'))
+```
+
+# Reading into topic modeling packages (topicmodels)
+
+There are a number of topic model instantiations in R. We will go through one of the more popular ones -- ``topicmodels`` which plays very nicely with the tidyverse.^[Perhaps the most popular topic modeling package in R has now become ``stm`` -- see [these](https://juliasilge.com/blog/sherlock-holmes-stm/) [nice](https://juliasilge.com/blog/evaluating-stm/) blog posts by Julia Silge for examples of working with ``stm`` through ``tidytext``.] 
+
+``topicmodels``'s main topic model function is ``LDA()``, which stands for Latent Dirichlet Allocation, a type of topic model and often used as shorthand for topic models in general. It takes a DTM as input and gives us an object of class ``LDA`` as output, which we can then analyze and visualize in the tidyverse. There are many points where we can customize, adjust parameters and so on but the one we must specify is the number of topics. This is something that often takes some fiddling with. Unless you have reason to think that the number of topics is extremely limited in a certain corpus one generally uses between ~20-50 topics. The other parameter it makes sense to think of prior to, or under, analysis is document size. As we've seen, a DTM will break up a text without concern for order within indvidual documents. So large documents will be extremely generalized in a DTM. It could well be reasonable to break up books, for example, by chapter. We could go more finer grained as well -- chunking by paragraph might make sense sometimes, too. Much will depend on the corpus and object of analysis. Experiment and see what leads to the most understandable and coherent topics.
+
+```{r, message = FALSE}
+options(stringsAsFactors = FALSE)
+library(tidyverse)
+library(tidytext)
+library(topicmodels)
+# read in the dataframe into R as normal
+nobel_tidy <- read_rds("data/nobel_stemmed.Rds") %>%
+  select(Year, Laureate, word_stem) %>%
+  rename(Year = Year, Laureate = Laureate, words = word_stem)
+# transform dataframe to DTM
+nobel_dtm <- nobel_tidy %>%
+  group_by(Year) %>%
+  count(words, sort = TRUE) %>%
+  cast_dtm(Year, words, n)
+```
+
+There are many points where we can customize, adjust parameters and so on but the one we must specify is the number of topics. This is something that often takes some fiddling with. Unless you have reason to think that the number of topics is extremely limited in a certain corpus one generally uses between ~15-50 topics (very roughly). 
+
+Another parameter it makes sense to think of prior to, or under, analysis is document size. As we've seen, a DTM will break up a text without concern for order within individual documents. So large documents will be extremely generalized in a DTM. It could well be reasonable to break up books, for example, by chapter. We could go more finer grained as well -- chunking by paragraph might make sense sometimes, too. Much will depend on the corpus and object of analysis. Experiment and see what leads to the most understandable and coherent topics.
+
+We are also using the corpus that we have already cleaned and removed stopwords from. We might also question if certain words are turning up so much in every document that they won't add anything to the topics that the topic model finds (removing frequently appearing words will also reduce the time it takes for the algorithm to fit the topic model). We might consider if, in the Nobel corpus, the word "nobel" will add anything to any of the topics, especially if we are treating the documents as the speeches as a whole. It might or might or not, topic models take some experimentation.
+
+Lastly, the alpha parameter controls how much documents come to be dominated by one or few topics or if the topics are more evenly distributed over documents. This parameter is automatically optimized by the algorithm if the user does not set it, but often algothithmic optimization does not lead to the best model fit from the standpoint of a human. This model tends toward a low alpha and very uneven topic spread so we'll set it ourselves. Again, this is something the analyst must experiment with.
+
+```{r}
+k = 15
+alpha = 2
+nobel_tm <- LDA(nobel_dtm, k = k, alpha = alpha)
+```
+
+Fitting the model involves us telling R finding a distributions that best match the corpus we have given the general structural assumptions the topic model takes. There are different methods for doing this and they might take a while. We are interested in two distributions: theta ($\theta$) -- the proportion of each document devoted to which topics, and beta ($\beta$) -- the proportion of each topic made up by which words (see the presentation [pdf](Presentations/Topic_models.pdf) for details).
+
+Let's first take a look at the output of the topic model. We call ``posterior()`` to get these so-called posterior distributions.
+
+```{r}
+str(posterior(nobel_tm))
+```
+
+If you call ``str()`` on this object you see ``topicmodels`` has returned two distributions, one called ``term`` that is made up of a matrix of the twenty topics on one axis and the 8063 unique words in the corpus on the other, with each entry indicating likelihood of that word turning up given the topic (we might think of this as the proportion of the topic taken up by each word in the corpus). It is a probability distribution so each words probability within a given topic has to sum to 1. This is the ``beta`` matrix. The topics distribution we see is a matrix size 92 x 20, the likelihood of each document (speech) containing each of 20 topics -- also summing to 1 within each document and that we might think of as proportions. So what do we do with this?
+
+The most useful thing to look at straight away are the highest words in each topic -- do the topics make sense to a human?
+
+```{r}
+terms(nobel_tm, 15)
+```
+
+We can, of course, work directly with these data structures but per our approach in this workshop, we're going to tidy our results and take the data interpretation and visualization back to the tidyverse where we have all its tools at our disposal. 
+
+# Making sense of and visualizing output
+
+Let's first plot the top words in each topic. This is generally where you want to start in evaluating a topic model -- are the topics interpretable. We use ``tidy()`` to transform the beta matrix into tidy format (one word per row) and then it is a simple task for us to plot it in ggplot.
+
+```{r}
+terms <- tidy(nobel_tm, matrix = "beta")
+words_in_topics <- terms %>%
+  group_by(topic) %>%
+  slice_max(beta, n = 10) %>% 
+  ungroup() %>%
+  arrange(topic, -beta)
+words_in_topics %>%
+  mutate(term = reorder_within(term, beta, topic)) %>%
+  ggplot(aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  scale_y_reordered()
+```
+
+Let's turn to the matrix of probabilities of topics over documents. To keep us on our toes ``topicmodels`` calls this not theta but ``gamma`` ($\gamma$). 
+
+```{r}
+topics_in_documents <- tidy(nobel_tm, matrix = "gamma")
+topics_in_documents
+```
+
+This tells us the estimated proportion of words in each given document devoted (generated by) to a specific topic. A problem here is that numbering topics makes it hard to figure out what this means. So we can first rename the topics. We can do this by hand (recommended) or automatically based on the highest ranking words in the previous beta matrix.
+
+```{r}
+# labelling by hand, we would extend this to 1:20, and given 20 topics if we wanted to name them all
+#hand_topics <- tibble(old_topic = 1:3, new_topic = c("International peace", "Nuclear", "Peac and war"))
+#topics_in_documents %>%
+#  left_join(hand_topics_topics, by=c("topic" = "old_topic"))
+
+# alternative two, easier for demonstration purposes on a sub-optimally-fit topic model
+(auto_topics <- apply(terms(nobel_tm, 3), 2, paste, collapse = "-"))  # pastes together the top three terms for each topic in the nobel topic model
+(auto_topics <- tibble(old_topic = 1:k, new_topic = auto_topics)) # make as tibble where numeric topics are matched with the auto generated ones
+(topics <- topics_in_documents %>%
+  left_join(auto_topics, by=c("topic" = "old_topic")))
+```
+
+Now we have our data in a familiar format we can subset and visualize. Perhaps we'd like to compare the topic distribution in several topics.
+
+```{r}
+topics %>%
+  filter(document %in% c(1977, 1985, 1996)) %>%  # the documents we want to compare
+  ggplot(aes(new_topic, gamma, fill = document)) +
+  geom_col() +
+  coord_flip() +
+  facet_wrap(~ document, ncol = 3)
+```
+
+We can visualize the distribution of all topics over time.
+
+```{r}
+topics %>%
+  ggplot(aes(document, gamma)) +
+    geom_col(aes(group = new_topic, fill = new_topic)) +
+    scale_x_discrete(breaks = seq(1905, 2019, 10))
+```
+
+Or look at the distribution of specific topics over time.
+
+```{r, eval = FALSE}
+# This one requires a more balanced topic mixture to be very meaningful, which the Nobel corpus with its current fit does to have
+topics %>%
+  filter(str_detect(new_topic, "war")) %>%
+  ggplot(aes(document, gamma)) +
+  geom_line(aes(group = new_topic, color = new_topic)) +
+  scale_x_discrete(breaks = seq(1905, 2019, 10))
+```
+
+# STM
+
+There are several packages in R that fit topic models, most notably ``stm`` which is incorporates a host of handy visualization tools as well as the capacity to incorporate covariates into the model fit (@roberts2019stm). 
+
+
+## Excercises
+- Run a topic model on the sustainability report corpus. How can we deal with year variables when they are not the name of the document?
+- Experiment more with the Nobel corpus. Can you find a better/more meaningful model fit? 
+
+# Other topic modeling resources
+
+This is only the most basic of introductions to topic modeling. For more information on topic modeling and analysis in the tidyverse, see chapter 6 of @silge2017text. 
+
+For a good explainer on topic models, see @underwood2012.
+
+# References

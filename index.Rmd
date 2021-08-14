@@ -1,0 +1,51 @@
+---
+title: "Computational Text Analysis for Historians"
+subtitle: "NTNU, Trondheim"
+author: Gregory Ferguson-Cradler^[Associate Professor, International Studies with History, Høgskolen i Innlandet. gregory.fergusoncradler@inn.no]
+date: "August 12-13, 2021"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+bibliography: textanalysis_general.bib
+nocite: '@*'
+---
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'))
+```
+
+# Overview
+
+The sheer amount of data produced by the modern world is nothing short of stupifying. Yet, as historians, we know that information overload is nothing new. Just as generations past have been swept over by tidal waves of information and had to figure out how to deal with potential overload, so too are modern scholars grappling with new ways to ingest and make use of copious amounts of text. One method increasingly popular in the social sciences and humanities is computational text analysis. 
+
+This workshop will walk through the basics of this rapidly growing field and hopefully help you think about how these techniques might be useful for your research and give you a basic technical foundation for actually using them. We will think a little bit about theory and ideas behind these techniques but the focus will be on practical matter: what sorts of methods are out there and how to implement the most basic ones. For those of you so inclined, the workshop will hopefully also give you enough background to enable you to broaden and deepen your grasp of these techniques.
+
+# Workshop goals
+
+The two major objectives in this workshop are to give participants a better idea of the sorts of things possible with computational text analysis and give you the basic practical knowledge to carry out basic methods. Thus, by the end of the workshop you will be able to compute and visualize, among other things: word clouds, word and n-gram frequency tables, measures of correlation and co-occurrence, document similarity, sentiment analysis, and topic models. Given the practical bent of the workshop, the first three sections are devoted to collecting texts, reading them into R, and cleaning and organizing document in preparation for analysis.
+
+# Pre-requisites
+
+It is assumed that participants know quite a bit of history but nothing else. We will be using the programming language R. To really hit the ground running and get the most possible out of our 2 day workshop, participants are strongly encouraged to to install some software (all free) and walk through a very basic tutorial on coding in R so that we can jump right into things. Information on pre-workshop tutorials and software is [here](TutorialInstructions.html).
+
+# Practicalities
+
+We will be roughly following the material in these tutorials in the workshop. We will likely not get through all of them so they are also being made available for participants to work through and refer to afterwards should they so desire.
+
+The data used in these tutorials and the RMarkdown files themselves can be downloaded from the workshop Github repository at https://github.com/gfe061/ntnutext/. 
+
+The following script will install (if not already installed) and load all packages used in this tutorial.
+
+```{r, eval = FALSE}
+if (!requireNamespace("xfun")) install.packages("xfun")
+xfun::pkg_attach2("tidyverse", "lubridate", "rvest", "stringr", "readtext", "tesseract", "tidytext", "SnowballC", "wordcloud", "wordcloud2", "widyr", "quanteda", "quanteda.textstats", "wordVectors", "magrittr", "pdftools")
+# The following two packages have Java dependencies that might give some (especially Windows) machines trouble. No worries if they don't load on your computer, I'll demonstrate running them on RStudio Cloud.
+xfun::pkg:attach2("tabulizer", "openNLP")
+```
+
+# References and Sources
+
+This workshop benefited (and sometimes borrowed liberally) from the following sources:

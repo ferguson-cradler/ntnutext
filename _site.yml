@@ -1,0 +1,52 @@
+name: "NTNU Workshop in Text Analysis"
+navbar:
+  # title: "NTNU Workshop in Text Analysis"
+  type: inverse
+  left:
+    - text: "Overview"
+      icon: fa-home
+      href: index.html
+    - text: "Schedule"
+      icon: fa-info
+      href: schedule.html
+    - text: "Session 1"
+      icon: fa-book
+      href: 1_RBasics.html
+    - text: "Session 2"
+      icon: fa-book
+      href: 2_ScrapingAndReadingInDocuments.html
+    - text: "Session 3"
+      icon: fa-book
+      href: 3_CleaningAndManipulating.html
+    - text: "Session 4"
+      icon: fa-book
+      href: 4_WordFreq.html
+    - text: "Session 5"
+      icon: fa-book
+      href: 5_SentAndDict.html
+    - text: "Session 6"
+      icon: fa-book
+      href: 6_DocSimil.html
+    - text: "Session 7"
+      icon: fa-book
+      href: 7_topicmodelling.html
+    - text: "Session 8"
+      icon: fa-book
+      href: 8_WordEmbedding.html
+    # - text: "Wrap-up"
+    #   icon: fa-book
+    #   href: wrapup.html
+  # right:
+  #   - icon: fa-envelope fa-lg
+  #     href: "mailto: gregory.fergusoncradler@inn.no"
+output:
+  html_document:
+    theme: spacelab
+    highlight: textmate
+    include:
+      after_body: footer.html
+    css: styles.css
+    citation_package: biblatex
+bibliography: ghfc_pubs.bib
+output_dir: docs
+

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Instructions of pre-workshop R tutorial</title>
+
+<script src="site_libs/header-attrs-2.9/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Overview
+  </a>
+</li>
+<li>
+  <a href="schedule.html">
+    <span class="fa fa-info"></span>
+     
+    Schedule
+  </a>
+</li>
+<li>
+  <a href="1_RBasics.html">
+    <span class="fa fa-book"></span>
+     
+    Session 1
+  </a>
+</li>
+<li>
+  <a href="2_ScrapingAndReadingInDocuments.html">
+    <span class="fa fa-book"></span>
+     
+    Session 2
+  </a>
+</li>
+<li>
+  <a href="3_CleaningAndManipulating.html">
+    <span class="fa fa-book"></span>
+     
+    Session 3
+  </a>
+</li>
+<li>
+  <a href="4_WordFreq.html">
+    <span class="fa fa-book"></span>
+     
+    Session 4
+  </a>
+</li>
+<li>
+  <a href="5_SentAndDict.html">
+    <span class="fa fa-book"></span>
+     
+    Session 5
+  </a>
+</li>
+<li>
+  <a href="6_DocSimil.html">
+    <span class="fa fa-book"></span>
+     
+    Session 6
+  </a>
+</li>
+<li>
+  <a href="7_topicmodelling.html">
+    <span class="fa fa-book"></span>
+     
+    Session 7
+  </a>
+</li>
+<li>
+  <a href="8_WordEmbedding.html">
+    <span class="fa fa-book"></span>
+     
+    Session 8
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Instructions of pre-workshop R tutorial</h1>
+<h3 class="subtitle">NTNU, Trondheim</h3>
+<h4 class="date">August 12-13, 2021</h4>
+
+</div>
+
+
+<p>To really hit the ground running and get the most possible out of our two-day workshop, I hope that as many participants as possible will be able to install some software (all free) on your computer and walk through a very basic tutorial on coding in R. The tutorials are broken up into units that should take between 10-20 minutes each and all told I’d guess these will keep you busy for 3 hours or so. They’re small enough that hopefully you won’t have trouble fitting them into your schedule, perhaps when you’re looking for ways to productively procrastinate on other things you’re supposed to be working on:).</p>
+<div id="install-r-and-rstudio." class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Install R and Rstudio.</h1>
+<p>Follow steps 1 and 2 at <a href="https://swirlstats.com/students.html" class="uri">https://swirlstats.com/students.html</a>.</p>
+<p>#Install swirl and two tutorials.</p>
+<p>Go to the same page (<a href="https://swirlstats.com/students.html" class="uri">https://swirlstats.com/students.html</a>), install swirl (which is step 3 on the webpage). Once you’ve installed swirl (i.e., what you did by typing: install.packages(“swirl”) in R, install two tutorials we’ll be doing parts of by typing and pressing enter (one time for each):</p>
+<pre class="r"><code>swirl::install_course(&quot;R Programming&quot;)
+swirl::install_course(&quot;Regular Expressions&quot;)</code></pre>
+<p>[The above window indicates what to enter into the R console in the lower left-hand window of RStudio]</p>
+<p>Now you can open swirl by entering:</p>
+<pre class="r"><code>library(&quot;swirl&quot;)
+swirl()</code></pre>
+<p>(You only have to type the first line once per R session – ie, if you exit swirl but don’t close Rstudio, you can enter swirl again by typing: swirl(). If you close Rstudio, you’ll need to repeat the first line as well (which loads the package).</p>
+</div>
+<div id="work-through-two-short-tutorials" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Work through two short tutorials</h1>
+<p>Open swirl (via the two lines above) and swirl will talk to you and tell you what to do in the console window in the lower left hand corner of Rstudio. It’s built for beginners so it should be straight forward to use. Of the two tutorials we installed, start with “R Programming” and do lessons 1-9, 12, and 14. I’d actually recommend all of them except Simulation (#13), which we won’t be doing, and Base Graphics (#15), which we won’t be using. It would be great if you could do all of “Regular Expressions” (it’s short and regular expressions are probably the most important thing to learn before you start working with text analysis on computers).</p>
+<p>[For those who prefer textbooks there is an excellent one online at <a href="https://r4ds.had.co.nz/index.html" class="uri">https://r4ds.had.co.nz/index.html</a>. Chapters 1-20 cover roughly the same material as the swirl tutorials but more and much more in depth. They take a lot longer than a couple of hours to go through and I didn’t think it fair to take up that much of your time but if you’re interested and want to do more, that’s where I’d start.]</p>
+</div>
+<div id="install-packages" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Install packages</h1>
+<p>We will need: tidyverse, tidytext, quanteda, stm, SnowballC, syuzhet, and readtext. To do this you will simply type at the R console prompt:</p>
+<pre class="r"><code>install.packages(&quot;NAME_OF_PACKAGE&quot;)
+## So, for instance, to install the first package listed above you’ll type: 
+install.packages(&quot;tidyverse&quot;)</code></pre>
+</div>
+<div id="prepare-own-documents" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Prepare own documents</h1>
+<p>If you’d like, you can prepare a handful of documents you’d like to play around with. We will be doing a lot of hands on work and I’ll have sample documents for us to use. I’m going to schedule in some time for you individually to test out these methods and experiment. If you have documents of your own you’re welcome to use these. They can be in electronic form of any sort, though preferably already machine readable (ie you can highlight the document’s text on your computer). We’ll talk about and do some examples of OCR (optical character recognition where you turn photos of text into computer text) but these take a long time to crunch. To prepare for this, have the documents you’d like to work with in a specific folder on the laptop you’ll have at the workshop (or, of course, on the cloud accessible via laptop at the workshop). It will also help if you put metadata in the filenames in a consistent manner such as, for instance: Tolstoy-War and Peace-1869.pdf.</p>
+</div>
+
+<br><br><p>2021. <a href="mailto: gregory.fergusoncradler@inn.no">gregory.fergusoncradler@inn.no</a></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

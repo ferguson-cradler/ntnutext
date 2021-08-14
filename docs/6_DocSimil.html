@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Session 6: Document similarity and co-occurrence</title>
+
+<script src="site_libs/header-attrs-2.9/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Overview
+  </a>
+</li>
+<li>
+  <a href="schedule.html">
+    <span class="fa fa-info"></span>
+     
+    Schedule
+  </a>
+</li>
+<li>
+  <a href="1_RBasics.html">
+    <span class="fa fa-book"></span>
+     
+    Session 1
+  </a>
+</li>
+<li>
+  <a href="2_ScrapingAndReadingInDocuments.html">
+    <span class="fa fa-book"></span>
+     
+    Session 2
+  </a>
+</li>
+<li>
+  <a href="3_CleaningAndManipulating.html">
+    <span class="fa fa-book"></span>
+     
+    Session 3
+  </a>
+</li>
+<li>
+  <a href="4_WordFreq.html">
+    <span class="fa fa-book"></span>
+     
+    Session 4
+  </a>
+</li>
+<li>
+  <a href="5_SentAndDict.html">
+    <span class="fa fa-book"></span>
+     
+    Session 5
+  </a>
+</li>
+<li>
+  <a href="6_DocSimil.html">
+    <span class="fa fa-book"></span>
+     
+    Session 6
+  </a>
+</li>
+<li>
+  <a href="7_topicmodelling.html">
+    <span class="fa fa-book"></span>
+     
+    Session 7
+  </a>
+</li>
+<li>
+  <a href="8_WordEmbedding.html">
+    <span class="fa fa-book"></span>
+     
+    Session 8
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Session 6: Document similarity and co-occurrence</h1>
+
+</div>
+
+
+<div id="document-term-matrices-and-other-packages" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Document-term matrices and other packages</h1>
+<p>We have up to now focused on text analysis within the tidyverse. The tidyverse is exceptional in its ease of use and user-friendliness. But at some point there will come time when we’ll need to step outside tidy-organizing principles.</p>
+<p>To wit, there are (at the very least) two other data structures you will need to be familiar with to do text analysis. By far the most common is the document-term matrix or DTM. A DTM is a matrix where each column is a word and each row represents a document. Every cell then indicates the frequency of occurrence (this might be raw counts, logged counts, boolean (present/not present), tf-idf or some other statistic of frequency) of a given word in a given document. The sum of rows in this matrix will be the total word counts of individual documents and the sum of columns will be the total word counts for given words across the entire corpus. The sum of sum of rows or columns will be the total word count of the corpus in its entirety. These matrices are also sometimes organized with the rows and columns reverse in term-document matrices, as below.</p>
+<div class="figure" style="text-align: center">
+<img src="data/dtm.jpg" alt="@jurafsky2014speech, ch. 6, pg. 7 online at http://www.web.stanford.edu/~jurafsky/slp3/6.pdf."  />
+<p class="caption">
+<span class="citation">Jurafsky and Martin (forthcoming)</span>, ch. 6, pg. 7 online at <a href="http://www.web.stanford.edu/~jurafsky/slp3/6.pdf" class="uri">http://www.web.stanford.edu/~jurafsky/slp3/6.pdf</a>.
+</p>
+</div>
+<p>If all you care about are words in documents without concern for their order, this is a handy structure for the data (it is also super efficient as matrix operations on computers have been optimized to be incredibly fast). Indeed, methods that are built from DTMs are often called bag-of-words models or methods, because all word order is lost right at the very beginning.</p>
+<p>You can’t see it from the above example but in a real life corpus and dtm there will be as many rows as unique words in the corpus and there are tons of words that will show up only in the rare document. So much of the DTM will be zeros, making them so-called “sparse matrices.”</p>
+<p>We can convert our tidy tibbles to DTMs with the <code>cast_dtm</code> function.</p>
+<pre class="r"><code>library(tidyverse)
+library(tidytext)
+nobel_tidy &lt;- read_rds(&quot;data/nobel_stemmed.Rds&quot;) %&gt;%
+  select(Year, Laureate, word_stem) %&gt;%
+  rename(Year = Year, Laureate = Laureate, words = word_stem)
+nobel_dtm &lt;- nobel_tidy %&gt;%
+  group_by(Year) %&gt;%
+  count(words, sort = TRUE) %&gt;%
+  cast_dtm(Year, words, n)
+nobel_dtm</code></pre>
+<pre><code>## &lt;&lt;DocumentTermMatrix (documents: 92, terms: 8363)&gt;&gt;
+## Non-/sparse entries: 49822/719574
+## Sparsity           : 94%
+## Maximal term length: 26
+## Weighting          : term frequency (tf)</code></pre>
+<p>Notice that what it prints out is not the matrix itself, or even the beginning of the matrix, but some summary information. We can call <code>str</code> on it to get a tiny idea of the structure but in general this is a more abstract class of data structure.</p>
+<p>To get back our tibble structure we use <code>tidy()</code>.</p>
+<pre class="r"><code>tidy(nobel_dtm)</code></pre>
+<pre><code>## # A tibble: 49,822 x 3
+##    document term   count
+##    &lt;chr&gt;    &lt;chr&gt;  &lt;dbl&gt;
+##  1 1981     refuge    91
+##  2 1954     refuge    71
+##  3 1925     refuge     3
+##  4 1926     refuge     3
+##  5 1971     refuge     4
+##  6 1965     refuge     3
+##  7 1946     refuge     1
+##  8 1978     refuge     1
+##  9 1959     refuge     2
+## 10 1947     refuge     1
+## # ... with 49,812 more rows</code></pre>
+<p>The same back and forth words for the dfm format, which is a document-term matrix structure used by the popular quanteda package. Quanteda offers a wealth of text analysis tools, models, statistics, and other functions. See their tutorial <a href="https://tutorials.quanteda.io/">here</a>.</p>
+<p>The one exception to this is when we’d like to have document variables associated with the documents in our dataframes. Corpus and dfm structures from quanteda allow for document variables (an example of document variables for our Nobel corpus would be the laureate’s name. But we could associate any years variables with these documents and then use them in analysis – we’ll talk a little bit about this when we talk about structural topic models.)</p>
+<p>If we want to retain document variables into dfms then we’ll need to “untidy” our data and convert into dfms via quanteda functions <code>corpus()</code> and <code>dfm</code>.</p>
+<pre class="r"><code>(nobel_df &lt;- nobel_tidy %&gt;%
+   mutate(decade = Year %/% 10 * 10) %&gt;%
+  group_by(Year, Laureate, decade) %&gt;% 
+  summarize(AwardSpeech = str_c(words, collapse = &quot; &quot;)) %&gt;%
+  ungroup())</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Year&#39;, &#39;Laureate&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## # A tibble: 92 x 4
+##     Year Laureate                                                 decade AwardSpeech
+##    &lt;dbl&gt; &lt;chr&gt;                                                     &lt;dbl&gt; &lt;chr&gt;      
+##  1  1905 Bertha von Suttner                                         1900 behalf nob~
+##  2  1906 Theodore Roosevelt                                         1900 nobel comm~
+##  3  1907 Ernesto Teodoro Moneta, Louis Renault                      1900 ernesto te~
+##  4  1908 Klas Pontus Arnoldson, Fredrik Bajer                       1900 behalf nob~
+##  5  1909 Auguste Beernaert, Paul Henri d&#39;Estournelles de Constant   1900 august bee~
+##  6  1910 Permanent International Peace Bureau                       1910 chairman c~
+##  7  1911 Tobias Asser, Alfred Fried                                 1910 tobia mich~
+##  8  1912 Elihu Root                                                 1910 elihu root~
+##  9  1913 Henri La Fontaine                                          1910 henri la f~
+## 10  1922 Fridtjof Nansen                                            1920 pleasur an~
+## # ... with 82 more rows</code></pre>
+<p>These three lines effectively unnest and untidy our data, giving us back the dataframe we started with. Now we can convert it to a dfm (which we have to do via a corpus structure – which is similar to our original data frame where there the document text is a character string and each document is associated with other variables).</p>
+<pre class="r"><code>library(quanteda)
+nobel_corp &lt;- corpus(nobel_df, docid_field = &quot;Year&quot;, text_field = &quot;AwardSpeech&quot;) # corpus() automatically includes all other columns that are not text and document names as variables
+docid &lt;- paste(nobel_df$Year, 
+               nobel_df$Laureate, sep = &quot; - &quot;)      # naming our documents in the corpus in &quot;Year - Laureate&quot; format
+docnames(nobel_corp) &lt;- docid
+nobel_tokens &lt;- tokens(nobel_corp)
+dfm_nobel &lt;- dfm(nobel_tokens)</code></pre>
+<p>And now we’re all set to work in quanteda!</p>
+</div>
+<div id="similarity-analysis" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Similarity analysis</h1>
+<p>How might we, at the level of documents not just individual words, measure how close two documents are to one another? It might sometimes make sense for us to think of documents as collections or vectors. We’ve seen in previous tutorials a vector in R is just a list of objects but where all objects have to be of the same data type, the formal R data structure <code>list</code> allowing different data types. Here we’re talking about vectors in a similar meaning but in a slightly more mathematical sense where vectors a geometric object with length and direction . We want to think about representing documents as vectors.</p>
+<p>So what can this possibly mean? The idea actually comes directly from our document-term matrix where every row is a series of numbers (ie. a vector) with each entry denoting frequency of occurrence of the word denoted by the column. This list of numbers can then be given geometric interpretation. If we pretend we have a corpus made up entirely of two words, for every document-row we could count how many times word1 appeared, that would be the entry in the first column, and how many times word2 appeared (column two and then take the two entries and plot them on a graph - Cartesian coordinate plane or whatever you want to call it. Below gives an example of a two-dimensional document vector.</p>
+<div class="figure" style="text-align: center">
+<img src="data/vector.jpg" alt="@jurafsky2014speech, ch. 6, pg. 7 online at http://www.web.stanford.edu/~jurafsky/slp3/6.pdf. This is an extremely helpful resource that hits a nice 'technical but not too technical' note for many topics in natural language processing."  />
+<p class="caption">
+<span class="citation">Jurafsky and Martin (forthcoming)</span>, ch. 6, pg. 7 online at <a href="http://www.web.stanford.edu/~jurafsky/slp3/6.pdf" class="uri">http://www.web.stanford.edu/~jurafsky/slp3/6.pdf</a>. This is an extremely helpful resource that hits a nice ‘technical but not too technical’ note for many topics in natural language processing.
+</p>
+</div>
+<p>The intuition here is that it says something about the document and <em>especially</em> the documents in relation to one another if we think of them as vectors. Documents who have vocabularies more similar to one another will be, we can say, more similar in general, and will have vectors that are more similar. Thus if we can turn documents into vectors and measure the distance of document vectors from one another we might capture (in one sense) how similar they are to one another. Real-life documents of course map not onto two-dimensional vector space as above but n-dimensional where n is the number of unique words in a corpus. There’s no way to visualize that but the intuition is the same, we can think of mapping each document into a vector space and then measuring its similarity to other document-vectors.</p>
+<p>The tools to do this are actually pretty standard and straightforward. This is what you do in the first or second week of multivariable calculus or linear algebra. We’ll save you the details but if you have done this stuff before your memory might be jogged by keywords such as “dot product” (measuring how far one vector extends in the direction of another) or law of cosines. If neither of those things means anything to you that’s totally fine. The point is that we transform our documents into vectors, but their vectors at the same origin point and measure the angle in between them and call it the cosine distance. If two vectors have the same number of the same words or some multiple thereof (think about what would happen if one vector was a given document and another was two copies of that same document – the second vector would point in the exact same direction simply twice as long. When the angle between documents is zero and the vectors are pointing exactly the same direction, we say the cosine distance is 1 (related to the fact that <span class="math inline">\(cos(0) = 1\)</span>) and when the angle is 90 degrees (which means that they have no words in common and are as distant as they could possibly get) we say the cosine distance is 0 (<span class="math inline">\(90^{\circ} = \frac{\pi}{2}\)</span> and <span class="math inline">\(cos(\frac{\pi}{2}) = 0\)</span>).</p>
+<p>We care about document vectors in relation to one another, they’re not going to tell us a whole lot on their own. Quanteda will make a nice little matrix of comparisons but if we have a 92x92 matrix it’s going to be a little unwieldy. So let’s break our corpus up into decades and compare decade by decade. Per our workflow, we’ll do the transformation in the tidyverse, then transform our data to something quanteda can work with – a dfm – and then do the analysis with quanteda.</p>
+<pre class="r"><code>library(quanteda.textstats)
+dfm_nobel_grouped &lt;- dfm_group(dfm_nobel, groups = decade)
+cos_sim &lt;- textstat_simil(dfm_nobel_grouped, margin = &#39;documents&#39;, method = &#39;cosine&#39;)
+cos_sim &lt;- as.matrix(cos_sim)
+cos_sim_df &lt;- as.data.frame(cos_sim)
+cos_sim_df[lower.tri(cos_sim_df, diag = FALSE)] &lt;- NA</code></pre>
+<p>And with a little wrangling we can turn it into a heat map via ggplot.</p>
+<pre class="r"><code>cos_sim_df[&#39;Year&#39;] &lt;- colnames(cos_sim_df)
+tot_gath &lt;- gather(cos_sim_df, 1:as.integer(ncol(cos_sim_df)-1), key = &#39;to&#39;, value = &#39;cosine&#39;)
+tot_gath &lt;- tot_gath %&gt;%
+  mutate(cosine = round(cosine,2))
+tot_gath %&gt;%
+  ggplot(aes(Year, to)) +
+  geom_tile(aes(fill = cosine)) +
+  scale_fill_continuous(&quot;&quot;,limits=c(.3, 1), breaks=seq(.3,1,by=0.2), low = &quot;white&quot;, high = &quot;blue&quot;, na.value = &quot;white&quot;) +
+  theme_bw() +
+  geom_text(aes(label = format(cosine, nsmall=1)), color = &#39;white&#39;) +
+  theme(axis.text.x=element_text(angle=0), axis.ticks=element_blank(), axis.line=element_blank(), panel.border=element_blank(),
+        panel.grid.major=element_line(color=&#39;#eeeeee&#39;)) +
+  labs(x = &#39;&#39;, y = &#39;&#39;, subtitle = &#39;Cosine Distances&#39;, title = &#39;Similarity of Nobel Peace Prize Award Speeches by Decade&#39;)</code></pre>
+<p><img src="6_DocSimil_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<div id="execises" class="section level2" number="2.1">
+<h2 number="2.1"><span class="header-section-number">2.1</span> Execises</h2>
+<ul>
+<li>Calculate cosine differences in the sustainability report corpus by year and/or by company. How might we visualize this by year and by company at the same time?</li>
+</ul>
+</div>
+<div id="co-occurance-networks" class="section level2" number="2.2">
+<h2 number="2.2"><span class="header-section-number">2.2</span> Co-occurance networks</h2>
+<p>Quanteda has a ton of different features – tests, transformations, and visualizations it will do. One is co-occurrence matrices and network visualizations. The package has a data structure called the frequency co-occurrence matrix – fcm – where rows and columns are the words of the corpus and the cells of the matrix denote how many times those two word co-occur (in a document, within a certain word window – the user determines this).</p>
+<p>One can then plot a network of these words where the points (nodes) are the words and links between them (edges) are co-occurrences, edge thickness indicates frequency of co-occurrence.</p>
+<pre class="r"><code>nobel_tidy &lt;- read_rds(&quot;nobel_stemmed.Rds&quot;) %&gt;%
+  select(Year, Laureate, word_stem) %&gt;%
+  rename(Year = Year, Laureate = Laureate, words = word_stem)
+nobel_tidy &lt;- nobel_tidy %&gt;%
+  mutate(decade = Year %/% 10 * 10)
+nobel_df &lt;- nobel_tidy %&gt;%
+  group_by(Year, Laureate, decade) %&gt;% 
+  summarize(AwardSpeech = str_c(words, collapse = &quot; &quot;)) %&gt;%
+  ungroup()
+nobel_corp &lt;- corpus(nobel_df, docid_field = &quot;Year&quot;, text_field = &quot;AwardSpeech&quot;) # corpus() automatically includes all other columns that are not text and document names as variables
+docid &lt;- paste(nobel_df$Year, 
+               nobel_df$Laureate, sep = &quot; - &quot;)      # naming our documents in the corpus in &quot;Year - Laureate&quot; format
+docnames(nobel_corp) &lt;- docid
+nobel_tokens &lt;- tokens(nobel_corp)
+library(quanteda.textplots)
+fcm_freq &lt;- fcm(nobel_tokens, context = &quot;window&quot;, tri = FALSE)
+#fcm_freq &lt;- fcm(dfm_nobel_grouped)
+top &lt;- names(topfeatures(fcm_freq, 30))
+size &lt;- log(colSums(dfm_select(fcm_freq, top)))
+fcm_top &lt;- fcm_select(fcm_freq, pattern = top)
+textplot_network(fcm_top, min_freq = .5)</code></pre>
+<p>And we can also change the size of labels according to frequency within the co-occurrence matrix.</p>
+<pre class="r"><code>textplot_network(fcm_top, min_freq = .5, vertex_labelsize = 1.5 * rowSums(fcm_top)/min(rowSums(fcm_top)))</code></pre>
+</div>
+<div id="excercises" class="section level2" number="2.3">
+<h2 number="2.3"><span class="header-section-number">2.3</span> Excercises</h2>
+<ul>
+<li>Take a look at the quanteda package and calculate (and interpret) one or more of the following: (M)TTR, document complexity, keyness between two documents.</li>
+</ul>
+</div>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-jurafsky2014speech" class="csl-entry">
+Jurafsky, Dan, and James H Martin. forthcoming. <span>“Speech and Language Processing. Vol. 3.”</span> Pearson London London. <a href="http://www.web.stanford.edu/ jurafsky/slp3/">http://www.web.stanford.edu/ jurafsky/slp3/</a>.
+</div>
+</div>
+</div>
+
+<br><br><p>2021. <a href="mailto: gregory.fergusoncradler@inn.no">gregory.fergusoncradler@inn.no</a></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Session 2: Web Scraping and Reading in Documents into R</title>
+
+<script src="site_libs/header-attrs-2.9/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/clipboard-1.7.1/clipboard.min.js"></script>
+<link href="site_libs/primer-tooltips-1.4.0/build.css" rel="stylesheet" />
+<link href="site_libs/klippy-0.0.0.9500/css/klippy.min.css" rel="stylesheet" />
+<script src="site_libs/klippy-0.0.0.9500/js/klippy.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Overview
+  </a>
+</li>
+<li>
+  <a href="schedule.html">
+    <span class="fa fa-info"></span>
+     
+    Schedule
+  </a>
+</li>
+<li>
+  <a href="1_RBasics.html">
+    <span class="fa fa-book"></span>
+     
+    Session 1
+  </a>
+</li>
+<li>
+  <a href="2_ScrapingAndReadingInDocuments.html">
+    <span class="fa fa-book"></span>
+     
+    Session 2
+  </a>
+</li>
+<li>
+  <a href="3_CleaningAndManipulating.html">
+    <span class="fa fa-book"></span>
+     
+    Session 3
+  </a>
+</li>
+<li>
+  <a href="4_WordFreq.html">
+    <span class="fa fa-book"></span>
+     
+    Session 4
+  </a>
+</li>
+<li>
+  <a href="5_SentAndDict.html">
+    <span class="fa fa-book"></span>
+     
+    Session 5
+  </a>
+</li>
+<li>
+  <a href="6_DocSimil.html">
+    <span class="fa fa-book"></span>
+     
+    Session 6
+  </a>
+</li>
+<li>
+  <a href="7_topicmodelling.html">
+    <span class="fa fa-book"></span>
+     
+    Session 7
+  </a>
+</li>
+<li>
+  <a href="8_WordEmbedding.html">
+    <span class="fa fa-book"></span>
+     
+    Session 8
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Session 2: Web Scraping and Reading in Documents into R</h1>
+
+</div>
+
+
+<script>
+  addClassKlippyTo("pre.r, pre.markdown");
+  addKlippy('right', 'top', 'auto', '1', 'Copy code', 'Copied!');
+</script>
+<div id="web-scraping" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Web scraping</h1>
+<p>Web scraping is a huge and often quite complicated topic that one would rightfully want to dedicate an entire workshop, possibly much longer than 2 days, to. Given that this is a large and rich potential source of text for historians, we look at just the <em>very</em> basics here.</p>
+<p>Say we’d like to scrape stories from nrk.no. Let’s just pick a random <a href="https://www.nrk.no/sport/ol-drama-for-iuel-_-full-forvirring-i-semifinalen-1.15595722">one</a>.</p>
+<div class="figure" style="text-align: center">
+<img src="data/nrk.jpg" alt="Top story on nrk.no when I was preparing this presentation"  />
+<p class="caption">
+Top story on nrk.no when I was preparing this presentation
+</p>
+</div>
+<p>We’ll use a library called <code>rvest</code>. We’ll first call the library, enter the url and use <code>read_html</code> to download the data from that url.</p>
+<pre class="r"><code>library(rvest)
+url &lt;- &quot;https://www.nrk.no/sport/ol-drama-for-iuel-_-full-forvirring-i-semifinalen-1.15595722&quot;
+nrk &lt;- read_html(url)
+nrk</code></pre>
+<pre><code>## {html_document}
+## &lt;html class=&quot;no-js sport&quot; lang=&quot;nb-NO&quot;&gt;
+## [1] &lt;head&gt;\n&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8 ...
+## [2] &lt;body&gt;\n&lt;svg style=&quot;display: none;&quot;&gt;&lt;defs&gt;&lt;g id=&quot;published-time&quot;&gt;&lt;path fi ...</code></pre>
+<p>So we have it? Well, kind of. We have “it” but we also have a whole lot more. There’s a lot of information on this page, much of which we don’t need or want to collect. The menus, the other related stories, and so on. Plus, what we get with R is not just what we see but a whole ton of tags and definitions that are intended for our browsers, not for us. We maybe want the text, headline, author, and the date. So how do we get this information, no more no less?</p>
+<p>We’ll need to go into the actual HTML code and find the information and then tell R where to get it. Luckily this is a bit easier than it sounds. In your web browser go to the menu button -&gt; More tools -&gt; Web Developer Tools.</p>
+<p>You’ll get a panel of web developer tools. On the top menu line of the panel is an icon (circled in the image below) for selecting an element in the page.</p>
+<div class="figure" style="text-align: center">
+<img src="data/nrk_tools.jpg" alt="This will look slightly different in different browsers."  />
+<p class="caption">
+This will look slightly different in different browsers.
+</p>
+</div>
+<p>With this selected, you now want to find the parts of the page you want to extract. When you go to the journalists’ names and hover over with your mouse, you will see a box above with <code>a.author__name</code> written in it. That’s the html tag telling the browser how to display the author’s names and that’s what we’ll tell R to extract.</p>
+<pre class="r"><code>authors &lt;- nrk %&gt;%
+  html_elements(&#39;a.author__name&#39;) %&gt;%
+  html_text()
+authors</code></pre>
+<pre><code>## [1] &quot;Hanne Skjellum Mueller&quot; &quot;Anders Skjerdingstad&quot;</code></pre>
+<p>We do the same with the thing with the headline, date and text (it might take some experimentation to get this right).</p>
+<pre class="r"><code>headline &lt;- nrk %&gt;%
+  html_elements(&#39;h1.title.title-large.article-title&#39;) %&gt;%
+    html_text()
+
+text &lt;- nrk %&gt;%
+  html_elements(&#39;div.lp_articlebody.text-body.text-body-sans-serif.container-widget-content.nostack.cf&#39;) %&gt;%
+  html_text()
+text</code></pre>
+<pre><code>## [1] &quot;\n\nDet hadde akkurat begynt å regne kraftig i Tokyo da den første semifinalen på 400 meter hekk skulle gå i gang. Og Amalie Iuel fikk en svært uheldig start på det hele, da hun snublet ut av startblokkene da hun skulle teste dem like før løpet. \n– Jeg hadde satt blokka og skulle ta en prøvestart, men det var vått på banen og jeg sklei. Så jeg satte den på nytt og da gikk det greit. Jeg føler ikke det satte meg så mye ut, selv om det ikke så sånn ut, forteller Iuel til NRK. \n\n\nTRØBBEL: Amalie Iuel fikk ingen god opplevelse i semifinalen i OL og snublet i oppvarmingen.\nFoto: Lise Åserud / NTB\n \nFor så tjuvstartet hun da smellet kom, og Iuel tok seg raskt til hodet. Reaksjonstiden viste – 0,08 sekund, og hun innså feilen det med en gang. \n– Jeg var sikker på at jeg hørte noe, men jeg så med en gang da jeg rykket ut av blokka, at det ikke var skuddet. Jeg må ha hørt noe på tribunen eller noe. Det er vanskelig å bevise for starteren og dommeren, sier Iuel. \n\n\nREAKSJON: Amalie Iuel forstod raskt egen feil.\nFoto: DYLAN MARTINEZ / Reuters\n \n– På 400 og 400 meter hekk så skjer jo ikke det, for man får ingen fordel, man tjener ikke noe på det på et såpass langt løp. Jeg reagerte på et eller annet som ikke var skuddet, og det er utrolig irriterende, forklarer hun videre. \nFikk starte under protest \nHun var raskt borte hos dommeren for å forklare seg. Og den norske hekkeløperen fikk starte. \nLikevel følte hun at løpet var kjørt. \n\n\nPRAT: Amalie Iuel snakket med dommeren og fikk starte.\nFoto: Lise Åserud / NTB\n \n– Han sa jeg kunne løpe under protest, men når det har skjedd, så klarte jeg ikke å nullstille meg og glemme det. Det ble et rotete løp og mange tanker som gikk igjennom hodet på en gang der. Det var lite fokus på siste løpet. Det gikk som det gikk, alle så jo det, forklarer 27-åringen, som deltar i sitt andre OL. \nIuel endte sist i feltet, og da resultatlistene kom, stod det at hun var diskvalifisert. \n– Det er kanskje like greit at det endte med en disk, i stedet for å få det resultatet jeg fikk, sier Iuel. \nIkke disket likevel \nMen da resultatlistene ble oppdatert, stod likevel Iuel oppført med tiden 57.61, og ikke «DQ». I stedet hadde hun fått et gult kort. Amerikanske Dalilah Muhammad vant klart, med 53.30.  \n– Hun fikk gult kort for å forstyrre de andre, ikke disk da de godtok at hun hørte en lyd, sier sportssjef i friidrettsforbundet, Erlend Slokvik. \nIuels uttalte mål i OL var å forbedre den personlige rekorden satt i Doha-VM, på 54.72. \n– Jeg må ærlig innrømme at jeg har hatt bedre dager. OL kommer ikke så veldig ofte, men jeg får snu det til noe positivt og si at det bare er tre år til neste gang. Men det er selvfølgelig dødskjipt. Det er ikke sånn man må avslutte et OL. Jeg må prøve ikke grave meg for langt ned. \n\n\nVÅTT: Selv om Iuel sklei før starten, følte hun ikke det var det som ødela semifinalen for henne.\nFoto: Lise Åserud / NTB\n \nFor dem som så på, var det vanskelig å skjønne hva som faktisk skjedde. \n– Vi sitter her i Oslo og forstår ganske lite, uttalte NRKs ekspert Christina Vukicevic. \n– Hun må ha fått lov til å starte selv om hun ble diskvalifisert, tippet Jann Post. \n– Jeg er litt usikker på reglene her. Det er mulig det er de ekstraordinære forholdene, sa Vebjørn Rodal, som mener Iuels forklaring på det som hendte var god. \nI morgen natt, norsk tid, løper lagkamerat Karsten Warholm finale på samme distanse. \n– Jeg må bare prøve å glemme det her, og jeg skal i hvert fall ikke dra ham med meg. Jeg må nullstille og backe Karsten. Det får bli jobben min nå, sier Iuel.\n&quot;</code></pre>
+<p>The date is a little bit trickier (as is the sub-headline). First of all, for me, looking at it the day of, the date is just “i dag.” That’s not too helpful for posterity. But it’s not just that, it’s within a <code>span</code> class that’s not going to recognize for various and sundry reasons anyway (you can try it). But if we click on the date and then look in the developer tools panel below (or on the side if its Chrome) it will show us that this span class is itself embedded in a a time tag (one line up from the span with the date-time) which in turn has a date-time. When we hover over this line we now see a box over the date with ‘time.datetime-absolute.datePublished’ written. Let’s see if this works.</p>
+<pre class="r"><code>library(lubridate)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lubridate&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     date, intersect, setdiff, union</code></pre>
+<pre class="r"><code>date &lt;- nrk %&gt;%
+  html_element(&#39;time.datetime-absolute.datePublished&#39;) %&gt;%
+  html_text()
+date</code></pre>
+<pre><code>## [1] &quot;\n02.08.2021, kl. 13.42\n&quot;</code></pre>
+<p>This has it, but more than we want. We have some “” which is code to create a new line on the page. There might well be a way to fine tune our html_element() parameters with <code>rvest</code> to get it to extract just the information we want but we can also do this with other R tools. We’ll use <a href="https://stringr.tidyverse.org/"><code>stringr</code></a> (yet another member of the tidyverse). <code>stringr</code> is a package to search ad manipulate character strings. What we need is something that will extract just the date from the above character string <code>time</code>. To do this we’ll think back and remember the tutorial on regular expressions. We’ll extract the portion of the string that matches the DDDD-DD-DD pattern, where D are digits.</p>
+<pre class="r"><code>library(stringr)
+
+date &lt;- date %&gt;%
+  str_extract(pattern = &quot;[0-9]{2}.[0-9]{2}.[0-9]{4}&quot;) %&gt;% # should be //.
+  dmy()</code></pre>
+<p>So we’ve now extracted all the information we want. We can put it all together in a dataframe now.</p>
+<pre class="r"><code>library(tidyverse)
+(article &lt;- tibble(Author = authors, Date = date, Headline = headline, Text = text))</code></pre>
+<pre><code>## # A tibble: 2 x 4
+##   Author                 Date       Headline                Text                
+##   &lt;chr&gt;                  &lt;date&gt;     &lt;chr&gt;                   &lt;chr&gt;               
+## 1 Hanne Skjellum Mueller 2021-08-02 OL-drama for Iuel – fu~ &quot;\n\nDet hadde akku~
+## 2 Anders Skjerdingstad   2021-08-02 OL-drama for Iuel – fu~ &quot;\n\nDet hadde akku~</code></pre>
+<p>Note in true tidy form its creating two rows of this dataframe, two “observations,” one for each journalist. We got this because we had two authors and they were in a vector of two items (each name). To condense we could concatenate them into one object.</p>
+<pre class="r"><code>(authors &lt;- str_c(authors, collapse = &quot;, &quot;)) # also from stringer, concatenates multiple character objects into one</code></pre>
+<pre><code>## [1] &quot;Hanne Skjellum Mueller, Anders Skjerdingstad&quot;</code></pre>
+<pre class="r"><code>(article &lt;- tibble(Author = authors, Date = date, Headline = headline, Text = text))</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##   Author                                       Date       Headline     Text     
+##   &lt;chr&gt;                                        &lt;date&gt;     &lt;chr&gt;        &lt;chr&gt;    
+## 1 Hanne Skjellum Mueller, Anders Skjerdingstad 2021-08-02 OL-drama fo~ &quot;\n\nDet~</code></pre>
+<div id="links-to-more-information" class="section level2" number="1.1">
+<h2 number="1.1"><span class="header-section-number">1.1</span> Links to more information</h2>
+<p>As noted, this is just the barest of introductions. I wanted, however, to at least go through the basics because it’s a rich source of possible texts for historians. As of just a few years ago if you wanted to do sophisticated web scraping you really had to turn to Python. And Python perhaps still has the edge, particularly with a library called BeautifulSoup.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> But packages in R have come a long way in the last couple years and you can now do pretty sophisticated scraping in R as well. I attach a few links that will help you get started if you are so interested.</p>
+<ul>
+<li><a href="https://rvest.tidyverse.org/articles/harvesting-the-web.html" class="uri">https://rvest.tidyverse.org/articles/harvesting-the-web.html</a></li>
+<li><a href="https://towardsdatascience.com/tidy-web-scraping-in-r-tutorial-and-resources-ac9f72b4fe47" class="uri">https://towardsdatascience.com/tidy-web-scraping-in-r-tutorial-and-resources-ac9f72b4fe47</a></li>
+<li><a href="https://github.com/yusuzech/r-web-scraping-cheat-sheet/blob/master/README.md" class="uri">https://github.com/yusuzech/r-web-scraping-cheat-sheet/blob/master/README.md</a></li>
+<li><a href="https://www.scrapingbee.com/blog/web-scraping-r/" class="uri">https://www.scrapingbee.com/blog/web-scraping-r/</a></li>
+</ul>
+</div>
+</div>
+<div id="reading-in-documents" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Reading in Documents</h1>
+<p>We’d be nowhere without documents! And getting them into R is no trivial task. The first question to ask is, what is the format of the documents I want to read into R?</p>
+<div id="csv-files" class="section level2" number="2.1">
+<h2 number="2.1"><span class="header-section-number">2.1</span> CSV Files</h2>
+<p>A CSV file stands for comma separated file and we should all be so lucky as to have corpora already in this form. True to its name it is a file where categories (columns in a dataframe) are delimited by commas and observations (rows) are delimited by rows. They will probably open automatically on your computer in Excel.</p>
+<p>Here I give you the example of a CSV I created from scraped Stortinget proceedings. This is a very partial (10.000 statements) piece of the much larger corpus of all statements from the late 1980s to 2020 (if you’re interested in the whole thing just let me know, I have the German Bundestag (1949-2020) and Russian Duma (mid-1990s-2020) also. Quality variable). The file is structured in the following manner: each statement is one line (tidy!), variables are the date, Storting session, speaker name, party, and text of the statement.</p>
+<pre class="r"><code>stortinget &lt;- read_csv(&#39;./data/stort.csv&#39;) #update with url</code></pre>
+<pre><code>## Warning: Missing column names filled in: &#39;X1&#39; [1]</code></pre>
+<pre><code>## 
+## -- Column specification --------------------------------------------------------
+## cols(
+##   X1 = col_double(),
+##   pos_date = col_date(format = &quot;&quot;),
+##   valg = col_double(),
+##   wc = col_double(),
+##   Navn = col_character(),
+##   Parti = col_character(),
+##   Statement = col_character(),
+##   year = col_double()
+## )</code></pre>
+<p>The <code>read_csv()</code> command is from the readr package a part of the tidyverse. And the message it shows us is helpful – readr is essentially looking at the data and guessing its structure and type. This is helpful for us to know, as it will impact what sorts of operations we can do on these individual columns.</p>
+<p>Let’s check what we have.</p>
+<pre class="r"><code>stortinget</code></pre>
+<pre><code>## # A tibble: 1,000 x 8
+##       X1 pos_date    valg    wc Navn                  Parti      Statement  year
+##    &lt;dbl&gt; &lt;date&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                 &lt;chr&gt;      &lt;chr&gt;     &lt;dbl&gt;
+##  1     1 2000-09-28  1997    69 D a g s o r d e n     Regjering  &quot;1. Inns~  2000
+##  2     2 2000-09-28  1997     8 Presidenten           Stortinget &quot;Represe~  2000
+##  3     3 2000-09-28  1997    44 Rolf Reikvam          SV         &quot;P\xe5 v~  2000
+##  4     4 2000-09-28  1997    32 Presidenten           Stortinget &quot;Ingen h~  2000
+##  5     5 2000-09-28  1997    39 Presidenten           Stortinget &quot;Ingen h~  2000
+##  6     6 2000-09-28  1997    19 Presidenten           Stortinget &quot;Represe~  2000
+##  7     7 2000-09-28  1997    35 Hallgeir H. Langeland SV         &quot;P\xe5 v~  2000
+##  8     8 2000-09-28  1997     7 Presidenten           Stortinget &quot;Represe~  2000
+##  9     9 2000-09-28  1997    21 Karin Andersen        SV         &quot;P\xe5 v~  2000
+## 10    10 2000-09-28  1997     8 Presidenten           Stortinget &quot;Represe~  2000
+## # ... with 990 more rows</code></pre>
+<p>And this gets at a frequent problem – encoding of non-English language characters. Here we see that å, æ and ø are not reading correctly. this is something we’ll need to be on guard for always.</p>
+<p>In this case, tidy, while it does a great job with most things, has trouble with Norwegian (we’re not the <a href="https://github.com/tidyverse/readr/issues/892">first to notice</a>. As noted at that link, we can either specify latin1 as our locale or use base R command read.csv(). Doing this, things look like they should (you can check that this is the case). As noted in the post, this will depend on settings on your local computer.</p>
+<pre class="r"><code>stortinget &lt;- read_csv(&#39;./data/stort.csv&#39;, locale=locale(encoding = &quot;latin1&quot;))</code></pre>
+<pre><code>## Warning: Missing column names filled in: &#39;X1&#39; [1]</code></pre>
+<pre><code>## 
+## -- Column specification --------------------------------------------------------
+## cols(
+##   X1 = col_double(),
+##   pos_date = col_date(format = &quot;&quot;),
+##   valg = col_double(),
+##   wc = col_double(),
+##   Navn = col_character(),
+##   Parti = col_character(),
+##   Statement = col_character(),
+##   year = col_double()
+## )</code></pre>
+<pre class="r"><code>stortinget</code></pre>
+<pre><code>## # A tibble: 1,000 x 8
+##       X1 pos_date    valg    wc Navn                  Parti      Statement  year
+##    &lt;dbl&gt; &lt;date&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                 &lt;chr&gt;      &lt;chr&gt;     &lt;dbl&gt;
+##  1     1 2000-09-28  1997    69 D a g s o r d e n     Regjering  1. Innst~  2000
+##  2     2 2000-09-28  1997     8 Presidenten           Stortinget Represen~  2000
+##  3     3 2000-09-28  1997    44 Rolf Reikvam          SV         På vegne~  2000
+##  4     4 2000-09-28  1997    32 Presidenten           Stortinget Ingen ha~  2000
+##  5     5 2000-09-28  1997    39 Presidenten           Stortinget Ingen ha~  2000
+##  6     6 2000-09-28  1997    19 Presidenten           Stortinget Represen~  2000
+##  7     7 2000-09-28  1997    35 Hallgeir H. Langeland SV         På vegne~  2000
+##  8     8 2000-09-28  1997     7 Presidenten           Stortinget Represen~  2000
+##  9     9 2000-09-28  1997    21 Karin Andersen        SV         På vegne~  2000
+## 10    10 2000-09-28  1997     8 Presidenten           Stortinget Represen~  2000
+## # ... with 990 more rows</code></pre>
+</div>
+<div id="reading-in-txt-doc-or-pdf-files" class="section level2" number="2.2">
+<h2 number="2.2"><span class="header-section-number">2.2</span> Reading in txt, doc or pdf files</h2>
+<p>Historians are interested in old books and there are a lot of old books freely accessible on the web already digitized (and some of them even cleaned). I just read <em>Ut og stjæle hester</em> over summer vacation so I’ve downloaded four novels of Charles Dickens, starting, of course, with <em>David Copperfield</em> in four different file formats.</p>
+<pre class="r"><code>(books_list &lt;- list.files(path = &quot;data/docs&quot;, full.names = TRUE))</code></pre>
+<pre><code>## [1] &quot;data/docs/A Christmas Carol - Charles Dickens - 1843.pdf&quot;
+## [2] &quot;data/docs/David Copperfield - Charles Dickens - 1850.txt&quot;
+## [3] &quot;data/docs/Hard Times - Charles Dickens - 1854.docx&quot;      
+## [4] &quot;data/docs/Oliver Twist - Charles Dickens - 1838.html&quot;</code></pre>
+<p><code>readtext</code> is a handy R package that will automatically decide what sort of file it is, read it in, AND will help us out with variables associated with the document.</p>
+<pre class="r"><code>library(readtext)
+books &lt;- readtext(books_list)
+# Notice this will save as a readtext object. Let&#39;s convert to our tidyverse&#39;s format for dataframes, called a tibble.
+books &lt;- as_tibble(books)</code></pre>
+<p>Notice that it has read these texts into R and we now have them all in a dataframe. But, unlike the Stortinget csv, we have no metadata (document variables). <code>readtext</code> allows us to import variables automatically from file names (assuming we have informative file names, which, as it <em>just so happens</em>, we do). We can do similar things with the help of the tidyverse and a function called <a href="https://tidyr.tidyverse.org/reference/separate.html"><code>separate</code></a>.</p>
+<pre class="r"><code>books &lt;- readtext(books_list, docvarsfrom=&quot;filenames&quot;, dvsep = &#39; - &#39;, docvarnames = c(&#39;Title&#39;, &#39;Author&#39;, &#39;Year&#39;)) %&gt;%
+  as_tibble()
+books</code></pre>
+<pre><code>## # A tibble: 4 x 5
+##   doc_id                                         text        Title  Author  Year
+##   &lt;chr&gt;                                          &lt;chr&gt;       &lt;chr&gt;  &lt;chr&gt;  &lt;int&gt;
+## 1 A Christmas Carol - Charles Dickens - 1843.pdf &quot; ^, A&lt;r  ~ A Chr~ Charl~  1843
+## 2 David Copperfield - Charles Dickens - 1850.txt &quot;ï»¿The Pr~ David~ Charl~  1850
+## 3 Hard Times - Charles Dickens - 1854.docx       &quot;The Proje~ Hard ~ Charl~  1854
+## 4 Oliver Twist - Charles Dickens - 1838.html     &quot;The Proje~ Olive~ Charl~  1838</code></pre>
+<p>(There is an R <a href="https://cran.r-project.org/web/packages/gutenbergr/vignettes/intro.html">package</a> for accessing Project Gutenberg that you would actually want to use that would be easier than downloading things by hand.</p>
+</div>
+<div id="pdfs-that-use-columns-or-other-different-text-layouts" class="section level2" number="2.3">
+<h2 number="2.3"><span class="header-section-number">2.3</span> PDFs that use columns or other different text layouts</h2>
+<p><code>readtext</code> and a similar R package called pdftools are great but they get flummoxed by weird text layouts, including kinds you find quite often in official state documents.</p>
+<div class="figure" style="text-align: center">
+<img src="data/stortExample.jpg" alt="Sample page of Storting proceedings. Bundestag proceedings, and doubtlessly many more, are formatted the same way."  />
+<p class="caption">
+Sample page of Storting proceedings. Bundestag proceedings, and doubtlessly many more, are formatted the same way.
+</p>
+</div>
+<p>readtext is going to have a hard time with that. You can try it yourself but it’s going to read from left to right across columns, rather than the left column first then the right.</p>
+<p>As of a couple of years ago one had to get really creative and cut the pdfs up and then sew them back together but now we have an R package that is quite smart about this called <code>tabulizer</code>. The package has java dependencies that might create huge problems in Windows – on my windows machine despite hours trying to troubleshoot I still have not been able to install it. I have a Linux machine that it works fine one so I use this, another option is to use Rstudio’s quite cool cloud service at <a href="https://rstudio.cloud" class="uri">https://rstudio.cloud</a>. We can upload documents there, install the packages we need on then download the resulting dataframe we build there.</p>
+<p>Let’s take a historical Storting melding. The front page looks like this.</p>
+<div class="figure" style="text-align: center">
+<img src="data/st_meld.jpg" alt="Clear machine-readable text but in columns."  />
+<p class="caption">
+Clear machine-readable text but in columns.
+</p>
+</div>
+<p>Other documents are printed in multi-column format as well. First we might try <code>readtext</code> and print out the first 1000 characters to see how things look.</p>
+<pre class="r"><code>df&lt;- readtext(&#39;data/stmeld8_kongo.pdf&#39;)
+str_sub(df$text, 1, 1000) # if we print out in cat() we see that the spacing is preserved from the original pdf</code></pre>
+<pre><code>## [1] &quot;                                                                       Utenriksdepartementet\n\n\n\n\n                                 St. meld. nr. 8.\n                                      (1960-61)\n             Melding om Norges deltaking i De Forente Nasjoners\n                            vaktstyrke i Kongo.\n                  Tilråding fra Utenriksdepartementet av 23. september 1960,\n                          godkjent ved kongelig resolusjon samme dag.\n\n                     (Foredratt av utenriksminister Halvard Lange.)\n\n    Den 30. juni 1960 ble tidligere Belgisk Kongo     Samtidig med dette brøt Katanga-provinsen\nproklamert som selvstendig stat.                    seg løs og proklamerte seg som selvstendig\n    Avtalen om at området som hadde vært            stat.\nunder belgisk overhøyhet siden 1885, skulle\nbli uavhengig, var inngått i Brussel i januar          Mot denne bakgrunn sendte den kongole\n1960 mellom den belgiske regjering og poli          siske regjering den 12. juli en telegr&quot;</code></pre>
+<p>It looks like we’ve read in a bunch of text, and we have. But if we look a bit closer, we see that the first sentence of the document in the pdf reads: “Den 30. juni 1960 ble tidligere Belgisk Kongo proklamert som selvstendig stat.” But <code>readtext</code> ignores the column space and has: “Den 30. juni 1960 ble tidligere Belgisk Kongo Samtidig med dette brøt Katanga-provinsen\nproklamert som selvstendig stat.” And we see the whitespace that is actually the column break. There are actually methods we’re going to use that will throw out word order and this sort of thing wouldn’t matter. But not always by any means.</p>
+<p>The tabulizer package is just as easy. Tabulizer can be probelmatic to install because of Java dependencies but run either from your own PC or from the RStudio cloud, it gives a much better result for no extra work.</p>
+<pre class="r"><code>library(tabulizer)
+file &lt;- &#39;data/stmeld8_kongo.pdf&#39;
+numpages &lt;- get_n_pages(file) 
+text &lt;- extract_text(file, encoding = &#39;UTF-8&#39;, pages=1:numpages) # this will return a vector of one character string per page. Take the pages option out of the call and we get one collapsed character string for the whole document. </code></pre>
+<p>Finally, tabulizer is an incredibly powerful package. If you have tables you’d like to read from pdfs, as economic historians very well might, I highly recommend tabulizer’s very cool <code>extract_areas()</code> function. Say we have a page like below and we’d like to extract just the table.</p>
+<div class="figure" style="text-align: center">
+<img src="data/statoilSRExample.jpg" alt="Page 44 of Statoil's 2001 Sustainability Report."  />
+<p class="caption">
+Page 44 of Statoil’s 2001 Sustainability Report.
+</p>
+</div>
+<p>We can do this interactively with tabulizer. We can call <code>extract_areas()</code> and then highlight the part of the page where the table is located telling tabulizer where to extract the table data from.</p>
+<pre class="r"><code>extract_areas(&quot;data/SRs/SR-2001-equinor.pdf&quot;, 44)</code></pre>
+<p>If you have numerous documents with tables at the same place you can also specify location to have tabulizer do this over numerous documents. Powerful stuff.</p>
+</div>
+<div id="reading-in-non-machine-readable-pdfs-hardest-and-probably-most-likely-for-historians" class="section level2" number="2.4">
+<h2 number="2.4"><span class="header-section-number">2.4</span> Reading in non-machine readable PDFs (hardest and probably most likely for historians)</h2>
+<p>Perhaps the documents we historians are most likely to want to analyze are hand-scanned archival documents. These we might have as pictures (jgp or gif or tiff formats perhaps) or pdf files on our local machine. To make these digitally analyzable we’ll need to use optical character recognition (OCR) technology. This is a rapidly progressing frontier of machine learning and the technology is constantly getting better. Humans are still far better at reading and recognizing text than computers but the gap is steadily shrinking and might one day in the future disappear. For now though, we’ll have to deal with less than perfection.</p>
+<p>R has “bindings” (packages that give access to) tessaract, which is an open source Google OCR project. Tessaract reads png images so images not saved as png will need to be converted. Below is an example using pdftools to do this from .pdf (see the Tessaract <a href="vignette">https://cran.r-project.org/web/packages/tesseract/vignettes/intro.html</a> for an example of how to do this for .jpg files using the R package magick.)</p>
+<p>The way OCR works is that the algorithms are made to “learn” by ingesting a large amount of data for which the right answers are known (ie. images of text that have been, perfectly, digitized). The algothithms trained to recognize English are included in the package, anything else has to be downloadde by hand as shown below (to find you needed language’s three letter code, see the <a href="tessdata">https://github.com/tesseract-ocr/tessdata</a> github repository).</p>
+<p>Here is an example from my archive photos, a document form the Norwegian Riksarkivet in Oslo.</p>
+<p><img src="data/doc_norsk.jpg" width="50%" /></p>
+<pre class="r"><code>library(tesseract)
+norsk &lt;- tesseract(language=&#39;nor&#39;) #before doing this you will need to have run: tesseract_download(&#39;nor&#39;)
+png_archivedoc &lt;- pdftools::pdf_convert(&quot;./data/Pris- og rasjonaliseringslov - Riksarkivet - 1953.pdf&quot;, dpi = 600)
+text &lt;- ocr(png_archivedoc, engine=norsk)</code></pre>
+</div>
+</div>
+<div id="appendix-slightly-more-advanced" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Appendix (slightly more advanced)</h1>
+<p>Back when we were scraping stories from the NRK website, we scraped one stroy. But probably what we’d really like to do is build up a <em>corpus</em> of texts, not just one article but numerous. You could just do the above by hand and have a tibble for every article and then combine multiple tibbles to get one large tibble that had your whole corpus. But there is a much better way and one that will introduce a basic concept of programming called a “for loop.”</p>
+<p>Assume we want to scrape a bunch of NRK stories. We can put the urls in a vector in R.</p>
+<pre class="r"><code>articles &lt;- c(&quot;https://www.nrk.no/sport/grovdal-fullstendig-parkert-i-ol-finalen_-_-det-er-rett-og-slett-litt-vondt-a-se-pa-1.15595563&quot;, &quot;https://www.nrk.no/sport/vant-heat-etter-fall-i-siste-runde_-_-umenneskelig-1.15595067&quot;, &quot;https://www.nrk.no/vestland/hemmelig-plan-for-statsraad-lehmkuhl_-sommerskuta-dukket-plutselig-opp-i-bergen-1.15595488&quot;, &quot;https://www.nrk.no/osloogviken/tiltalt-for-forsettlig-drap-pa-christian-halvorsen-1.15595796&quot;) # a random list of the top stories on NRK at the time of writing. Saving as character objects so remember to put the urls in quotes</code></pre>
+<p>I now have a list of urls and for each item of this list I want to do the same thing. So we will “loop” through this list doing what we just did for the one NRK article to each of the objects of this list. Here is the syntax.</p>
+<pre class="r"><code>corpus &lt;- tibble()  # creating an empty tibble to copy everything into
+for (url in articles){ # looping over our list of 4 urls
+  nrk &lt;- read_html(url) 
+  authors &lt;- nrk %&gt;%
+    html_elements(&#39;a.author__name&#39;) %&gt;%
+    html_text()
+  authors &lt;- str_c(authors[[1]], collapse = &quot;, &quot;) # also from stringer, concatenates multiple character objects into one
+  headline &lt;- nrk %&gt;%
+    html_elements(&#39;h1.title.title-large.article-title&#39;) %&gt;%
+    html_text()
+  text &lt;- nrk %&gt;%
+    html_elements(&#39;div.lp_articlebody.text-body.text-body-sans-serif.container-widget-content.nostack.cf&#39;) %&gt;%
+    html_text()
+  date &lt;- nrk %&gt;%
+    html_element(&#39;time.datetime-absolute.datePublished&#39;) %&gt;%
+    html_text() %&gt;%
+    str_extract(pattern = &quot;[0-9]{2}.[0-9]{2}.[0-9]{2}&quot;) %&gt;%
+    dmy()
+  article &lt;- tibble(Author = authors, Date = date, Headline = headline, Text = text, URL = url)
+  corpus &lt;- rbind(corpus, article) # rbind stands for &quot;row bind&quot;. We copy the rows of our new article dataframe to the old corpus dataframe which at the end of the for loop will give us a dataframe called corpus with all the data from our four articles
+  }</code></pre>
+<p>In words, we are telling R: “Hey R, I have a vector (i.e. a list) called <code>articles</code>. I want you to go into this vector and look at each object individually. We’re going to call these objects <code>url</code> (note we could call them anything at all, this is just name. Often objects in for lists are called i, sometimes x, etc.) For each individual object in my vector, do what is written in the curly braces (all the steps we went through to scrape one article”).</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-mitchell2018web" class="csl-entry">
+Mitchell, Ryan. 2018. <em>Web Scraping with Python: Collecting More Data from the Modern Web</em>. " O’Reilly Media, Inc.".
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>A good, thorough introduction for those interested is <span class="citation">Mitchell (2018)</span>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+
+<br><br><p>2021. <a href="mailto: gregory.fergusoncradler@inn.no">gregory.fergusoncradler@inn.no</a></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Session 7: Topic modeling</title>
+
+<script src="site_libs/header-attrs-2.9/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/clipboard-1.7.1/clipboard.min.js"></script>
+<link href="site_libs/primer-tooltips-1.4.0/build.css" rel="stylesheet" />
+<link href="site_libs/klippy-0.0.0.9500/css/klippy.min.css" rel="stylesheet" />
+<script src="site_libs/klippy-0.0.0.9500/js/klippy.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Overview
+  </a>
+</li>
+<li>
+  <a href="schedule.html">
+    <span class="fa fa-info"></span>
+     
+    Schedule
+  </a>
+</li>
+<li>
+  <a href="1_RBasics.html">
+    <span class="fa fa-book"></span>
+     
+    Session 1
+  </a>
+</li>
+<li>
+  <a href="2_ScrapingAndReadingInDocuments.html">
+    <span class="fa fa-book"></span>
+     
+    Session 2
+  </a>
+</li>
+<li>
+  <a href="3_CleaningAndManipulating.html">
+    <span class="fa fa-book"></span>
+     
+    Session 3
+  </a>
+</li>
+<li>
+  <a href="4_WordFreq.html">
+    <span class="fa fa-book"></span>
+     
+    Session 4
+  </a>
+</li>
+<li>
+  <a href="5_SentAndDict.html">
+    <span class="fa fa-book"></span>
+     
+    Session 5
+  </a>
+</li>
+<li>
+  <a href="6_DocSimil.html">
+    <span class="fa fa-book"></span>
+     
+    Session 6
+  </a>
+</li>
+<li>
+  <a href="7_topicmodelling.html">
+    <span class="fa fa-book"></span>
+     
+    Session 7
+  </a>
+</li>
+<li>
+  <a href="8_WordEmbedding.html">
+    <span class="fa fa-book"></span>
+     
+    Session 8
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Session 7: Topic modeling</h1>
+
+</div>
+
+
+<script>
+  addClassKlippyTo("pre.r, pre.markdown");
+  addKlippy('right', 'top', 'auto', '1', 'Copy code', 'Copied!');
+</script>
+<div id="reading-into-topic-modeling-packages-topicmodels" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Reading into topic modeling packages (topicmodels)</h1>
+<p>There are a number of topic model instantiations in R. We will go through one of the more popular ones – <code>topicmodels</code> which plays very nicely with the tidyverse.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<p><code>topicmodels</code>’s main topic model function is <code>LDA()</code>, which stands for Latent Dirichlet Allocation, a type of topic model and often used as shorthand for topic models in general. It takes a DTM as input and gives us an object of class <code>LDA</code> as output, which we can then analyze and visualize in the tidyverse. There are many points where we can customize, adjust parameters and so on but the one we must specify is the number of topics. This is something that often takes some fiddling with. Unless you have reason to think that the number of topics is extremely limited in a certain corpus one generally uses between ~20-50 topics. The other parameter it makes sense to think of prior to, or under, analysis is document size. As we’ve seen, a DTM will break up a text without concern for order within indvidual documents. So large documents will be extremely generalized in a DTM. It could well be reasonable to break up books, for example, by chapter. We could go more finer grained as well – chunking by paragraph might make sense sometimes, too. Much will depend on the corpus and object of analysis. Experiment and see what leads to the most understandable and coherent topics.</p>
+<pre class="r"><code>options(stringsAsFactors = FALSE)
+library(tidyverse)
+library(tidytext)
+library(topicmodels)
+# read in the dataframe into R as normal
+nobel_tidy &lt;- read_rds(&quot;data/nobel_stemmed.Rds&quot;) %&gt;%
+  select(Year, Laureate, word_stem) %&gt;%
+  rename(Year = Year, Laureate = Laureate, words = word_stem)
+# transform dataframe to DTM
+nobel_dtm &lt;- nobel_tidy %&gt;%
+  group_by(Year) %&gt;%
+  count(words, sort = TRUE) %&gt;%
+  cast_dtm(Year, words, n)</code></pre>
+<p>There are many points where we can customize, adjust parameters and so on but the one we must specify is the number of topics. This is something that often takes some fiddling with. Unless you have reason to think that the number of topics is extremely limited in a certain corpus one generally uses between ~15-50 topics (very roughly).</p>
+<p>Another parameter it makes sense to think of prior to, or under, analysis is document size. As we’ve seen, a DTM will break up a text without concern for order within individual documents. So large documents will be extremely generalized in a DTM. It could well be reasonable to break up books, for example, by chapter. We could go more finer grained as well – chunking by paragraph might make sense sometimes, too. Much will depend on the corpus and object of analysis. Experiment and see what leads to the most understandable and coherent topics.</p>
+<p>We are also using the corpus that we have already cleaned and removed stopwords from. We might also question if certain words are turning up so much in every document that they won’t add anything to the topics that the topic model finds (removing frequently appearing words will also reduce the time it takes for the algorithm to fit the topic model). We might consider if, in the Nobel corpus, the word “nobel” will add anything to any of the topics, especially if we are treating the documents as the speeches as a whole. It might or might or not, topic models take some experimentation.</p>
+<p>Lastly, the alpha parameter controls how much documents come to be dominated by one or few topics or if the topics are more evenly distributed over documents. This parameter is automatically optimized by the algorithm if the user does not set it, but often algothithmic optimization does not lead to the best model fit from the standpoint of a human. This model tends toward a low alpha and very uneven topic spread so we’ll set it ourselves. Again, this is something the analyst must experiment with.</p>
+<pre class="r"><code>k = 15
+alpha = 2
+nobel_tm &lt;- LDA(nobel_dtm, k = k, alpha = alpha)</code></pre>
+<p>Fitting the model involves us telling R finding a distributions that best match the corpus we have given the general structural assumptions the topic model takes. There are different methods for doing this and they might take a while. We are interested in two distributions: theta (<span class="math inline">\(\theta\)</span>) – the proportion of each document devoted to which topics, and beta (<span class="math inline">\(\beta\)</span>) – the proportion of each topic made up by which words (see the presentation <a href="Presentations/Topic_models.pdf">pdf</a> for details).</p>
+<p>Let’s first take a look at the output of the topic model. We call <code>posterior()</code> to get these so-called posterior distributions.</p>
+<pre class="r"><code>str(posterior(nobel_tm))</code></pre>
+<pre><code>## List of 2
+##  $ terms : num [1:15, 1:8363] 9.39e-19 4.38e-04 1.01e-166 1.40e-03 2.36e-04 ...
+##   ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. ..$ : chr [1:15] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##   .. ..$ : chr [1:8363] &quot;refuge&quot; &quot;nuclear&quot; &quot;weapon&quot; &quot;war&quot; ...
+##  $ topics: num [1:92, 1:15] 6.05e-06 1.00 8.71e-06 6.59e-06 6.59e-06 ...
+##   ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. ..$ : chr [1:92] &quot;1981&quot; &quot;2017&quot; &quot;1954&quot; &quot;1925&quot; ...
+##   .. ..$ : chr [1:15] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...</code></pre>
+<p>If you call <code>str()</code> on this object you see <code>topicmodels</code> has returned two distributions, one called <code>term</code> that is made up of a matrix of the twenty topics on one axis and the 8063 unique words in the corpus on the other, with each entry indicating likelihood of that word turning up given the topic (we might think of this as the proportion of the topic taken up by each word in the corpus). It is a probability distribution so each words probability within a given topic has to sum to 1. This is the <code>beta</code> matrix. The topics distribution we see is a matrix size 92 x 20, the likelihood of each document (speech) containing each of 20 topics – also summing to 1 within each document and that we might think of as proportions. So what do we do with this?</p>
+<p>The most useful thing to look at straight away are the highest words in each topic – do the topics make sense to a human?</p>
+<pre class="r"><code>terms(nobel_tm, 15)</code></pre>
+<pre><code>##       Topic 1   Topic 2     Topic 3   Topic 4    Topic 5    Topic 6    
+##  [1,] &quot;nuclear&quot; &quot;peac&quot;      &quot;peac&quot;    &quot;peac&quot;     &quot;war&quot;      &quot;peac&quot;     
+##  [2,] &quot;weapon&quot;  &quot;prize&quot;     &quot;war&quot;     &quot;war&quot;      &quot;peac&quot;     &quot;south&quot;    
+##  [3,] &quot;peac&quot;    &quot;nobel&quot;     &quot;weapon&quot;  &quot;intern&quot;   &quot;world&quot;    &quot;prize&quot;    
+##  [4,] &quot;world&quot;   &quot;right&quot;     &quot;world&quot;   &quot;marshal&quot;  &quot;nation&quot;   &quot;peopl&quot;    
+##  [5,] &quot;nobel&quot;   &quot;countri&quot;   &quot;nuclear&quot; &quot;red&quot;      &quot;peopl&quot;    &quot;white&quot;    
+##  [6,] &quot;disarma&quot; &quot;democraci&quot; &quot;nation&quot;  &quot;cross&quot;    &quot;union&quot;    &quot;human&quot;    
+##  [7,] &quot;war&quot;     &quot;peopl&quot;     &quot;unit&quot;    &quot;law&quot;      &quot;intern&quot;   &quot;nobel&quot;    
+##  [8,] &quot;intern&quot;  &quot;human&quot;     &quot;prize&quot;   &quot;confer&quot;   &quot;prize&quot;    &quot;africa&quot;   
+##  [9,] &quot;prize&quot;   &quot;award&quot;     &quot;peopl&quot;   &quot;time&quot;     &quot;committe&quot; &quot;struggl&quot;  
+## [10,] &quot;nation&quot;  &quot;nation&quot;    &quot;paul&quot;    &quot;nation&quot;   &quot;nobel&quot;    &quot;african&quot;  
+## [11,] &quot;arm&quot;     &quot;world&quot;     &quot;time&quot;    &quot;organ&quot;    &quot;time&quot;     &quot;ahtisaari&quot;
+## [12,] &quot;award&quot;   &quot;polit&quot;     &quot;intern&quot;  &quot;countri&quot;  &quot;life&quot;     &quot;nation&quot;   
+## [13,] &quot;peopl&quot;   &quot;plan&quot;      &quot;test&quot;    &quot;bunch&quot;    &quot;jouhaux&quot;  &quot;world&quot;    
+## [14,] &quot;power&quot;   &quot;committe&quot;  &quot;power&quot;   &quot;committe&quot; &quot;award&quot;    &quot;polit&quot;    
+## [15,] &quot;iaea&quot;    &quot;govern&quot;    &quot;pearson&quot; &quot;word&quot;     &quot;norman&quot;   &quot;countri&quot;  
+##       Topic 7   Topic 8      Topic 9      Topic 10   Topic 11  Topic 12   
+##  [1,] &quot;peac&quot;    &quot;peac&quot;       &quot;refuge&quot;     &quot;peac&quot;     &quot;right&quot;   &quot;peac&quot;     
+##  [2,] &quot;war&quot;     &quot;countri&quot;    &quot;war&quot;        &quot;nation&quot;   &quot;human&quot;   &quot;prize&quot;    
+##  [3,] &quot;nation&quot;  &quot;world&quot;      &quot;nation&quot;     &quot;world&quot;    &quot;peac&quot;    &quot;nobel&quot;    
+##  [4,] &quot;leagu&quot;   &quot;nation&quot;     &quot;countri&quot;    &quot;organ&quot;    &quot;countri&quot; &quot;world&quot;    
+##  [5,] &quot;govern&quot;  &quot;agricultur&quot; &quot;offic&quot;      &quot;war&quot;      &quot;world&quot;   &quot;war&quot;      
+##  [6,] &quot;time&quot;    &quot;prize&quot;      &quot;europ&quot;      &quot;intern&quot;   &quot;prize&quot;   &quot;committe&quot; 
+##  [7,] &quot;disarma&quot; &quot;war&quot;        &quot;leagu&quot;      &quot;countri&quot;  &quot;nobel&quot;   &quot;award&quot;    
+##  [8,] &quot;intern&quot;  &quot;wheat&quot;      &quot;govern&quot;     &quot;unit&quot;     &quot;intern&quot;  &quot;intern&quot;   
+##  [9,] &quot;countri&quot; &quot;peopl&quot;      &quot;peopl&quot;      &quot;american&quot; &quot;nation&quot;  &quot;norwegian&quot;
+## [10,] &quot;world&quot;   &quot;social&quot;     &quot;world&quot;      &quot;confer&quot;   &quot;organis&quot; &quot;countri&quot;  
+## [11,] &quot;germani&quot; &quot;develop&quot;    &quot;peac&quot;       &quot;time&quot;     &quot;war&quot;     &quot;nation&quot;   
+## [12,] &quot;noel&quot;    &quot;nobel&quot;      &quot;nansen&quot;     &quot;leagu&quot;    &quot;peopl&quot;   &quot;peopl&quot;    
+## [13,] &quot;polit&quot;   &quot;econom&quot;     &quot;time&quot;       &quot;ilo&quot;      &quot;award&quot;   &quot;polit&quot;    
+## [14,] &quot;baker&quot;   &quot;polit&quot;      &quot;unit&quot;       &quot;polit&quot;    &quot;declar&quot;  &quot;organ&quot;    
+## [15,] &quot;declar&quot;  &quot;dr&quot;         &quot;commission&quot; &quot;govern&quot;   &quot;freedom&quot; &quot;human&quot;    
+##       Topic 13   Topic 14     Topic 15 
+##  [1,] &quot;peac&quot;     &quot;peac&quot;       &quot;peac&quot;   
+##  [2,] &quot;prize&quot;    &quot;life&quot;       &quot;nation&quot; 
+##  [3,] &quot;nobel&quot;    &quot;world&quot;      &quot;world&quot;  
+##  [4,] &quot;countri&quot;  &quot;war&quot;        &quot;unit&quot;   
+##  [5,] &quot;unicef&quot;   &quot;carter&quot;     &quot;war&quot;    
+##  [6,] &quot;peopl&quot;    &quot;time&quot;       &quot;prize&quot;  
+##  [7,] &quot;world&quot;    &quot;quaker&quot;     &quot;women&quot;  
+##  [8,] &quot;process&quot;  &quot;presid&quot;     &quot;peopl&quot;  
+##  [9,] &quot;children&quot; &quot;human&quot;      &quot;nobel&quot;  
+## [10,] &quot;nation&quot;   &quot;live&quot;       &quot;human&quot;  
+## [11,] &quot;develop&quot;  &quot;father&quot;     &quot;countri&quot;
+## [12,] &quot;conflict&quot; &quot;peopl&quot;      &quot;right&quot;  
+## [13,] &quot;polit&quot;    &quot;schweitzer&quot; &quot;hope&quot;   
+## [14,] &quot;laureat&quot;  &quot;countri&quot;    &quot;forc&quot;   
+## [15,] &quot;time&quot;     &quot;pire&quot;       &quot;time&quot;</code></pre>
+<p>We can, of course, work directly with these data structures but per our approach in this workshop, we’re going to tidy our results and take the data interpretation and visualization back to the tidyverse where we have all its tools at our disposal.</p>
+</div>
+<div id="making-sense-of-and-visualizing-output" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Making sense of and visualizing output</h1>
+<p>Let’s first plot the top words in each topic. This is generally where you want to start in evaluating a topic model – are the topics interpretable. We use <code>tidy()</code> to transform the beta matrix into tidy format (one word per row) and then it is a simple task for us to plot it in ggplot.</p>
+<pre class="r"><code>terms &lt;- tidy(nobel_tm, matrix = &quot;beta&quot;)
+words_in_topics &lt;- terms %&gt;%
+  group_by(topic) %&gt;%
+  slice_max(beta, n = 10) %&gt;% 
+  ungroup() %&gt;%
+  arrange(topic, -beta)
+words_in_topics %&gt;%
+  mutate(term = reorder_within(term, beta, topic)) %&gt;%
+  ggplot(aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = &quot;free&quot;) +
+  scale_y_reordered()</code></pre>
+<p><img src="7_topicmodelling_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Let’s turn to the matrix of probabilities of topics over documents. To keep us on our toes <code>topicmodels</code> calls this not theta but <code>gamma</code> (<span class="math inline">\(\gamma\)</span>).</p>
+<pre class="r"><code>topics_in_documents &lt;- tidy(nobel_tm, matrix = &quot;gamma&quot;)
+topics_in_documents</code></pre>
+<pre><code>## # A tibble: 1,380 x 3
+##    document topic      gamma
+##    &lt;chr&gt;    &lt;int&gt;      &lt;dbl&gt;
+##  1 1981         1 0.00000605
+##  2 2017         1 1.00      
+##  3 1954         1 0.00000871
+##  4 1925         1 0.00000659
+##  5 1926         1 0.00000659
+##  6 1968         1 0.00000735
+##  7 2013         1 0.0000123 
+##  8 1988         1 0.00442   
+##  9 1953         1 0.00000541
+## 10 2016         1 0.0000106 
+## # ... with 1,370 more rows</code></pre>
+<p>This tells us the estimated proportion of words in each given document devoted (generated by) to a specific topic. A problem here is that numbering topics makes it hard to figure out what this means. So we can first rename the topics. We can do this by hand (recommended) or automatically based on the highest ranking words in the previous beta matrix.</p>
+<pre class="r"><code># labelling by hand, we would extend this to 1:20, and given 20 topics if we wanted to name them all
+#hand_topics &lt;- tibble(old_topic = 1:3, new_topic = c(&quot;International peace&quot;, &quot;Nuclear&quot;, &quot;Peac and war&quot;))
+#topics_in_documents %&gt;%
+#  left_join(hand_topics_topics, by=c(&quot;topic&quot; = &quot;old_topic&quot;))
+
+# alternative two, easier for demonstration purposes on a sub-optimally-fit topic model
+(auto_topics &lt;- apply(terms(nobel_tm, 3), 2, paste, collapse = &quot;-&quot;))  # pastes together the top three terms for each topic in the nobel topic model</code></pre>
+<pre><code>##               Topic 1               Topic 2               Topic 3 
+## &quot;nuclear-weapon-peac&quot;    &quot;peac-prize-nobel&quot;     &quot;peac-war-weapon&quot; 
+##               Topic 4               Topic 5               Topic 6 
+##     &quot;peac-war-intern&quot;      &quot;war-peac-world&quot;    &quot;peac-south-prize&quot; 
+##               Topic 7               Topic 8               Topic 9 
+##     &quot;peac-war-nation&quot;  &quot;peac-countri-world&quot;   &quot;refuge-war-nation&quot; 
+##              Topic 10              Topic 11              Topic 12 
+##   &quot;peac-nation-world&quot;    &quot;right-human-peac&quot;    &quot;peac-prize-nobel&quot; 
+##              Topic 13              Topic 14              Topic 15 
+##    &quot;peac-prize-nobel&quot;     &quot;peac-life-world&quot;   &quot;peac-nation-world&quot;</code></pre>
+<pre class="r"><code>(auto_topics &lt;- tibble(old_topic = 1:k, new_topic = auto_topics)) # make as tibble where numeric topics are matched with the auto generated ones</code></pre>
+<pre><code>## # A tibble: 15 x 2
+##    old_topic new_topic          
+##        &lt;int&gt; &lt;chr&gt;              
+##  1         1 nuclear-weapon-peac
+##  2         2 peac-prize-nobel   
+##  3         3 peac-war-weapon    
+##  4         4 peac-war-intern    
+##  5         5 war-peac-world     
+##  6         6 peac-south-prize   
+##  7         7 peac-war-nation    
+##  8         8 peac-countri-world 
+##  9         9 refuge-war-nation  
+## 10        10 peac-nation-world  
+## 11        11 right-human-peac   
+## 12        12 peac-prize-nobel   
+## 13        13 peac-prize-nobel   
+## 14        14 peac-life-world    
+## 15        15 peac-nation-world</code></pre>
+<pre class="r"><code>(topics &lt;- topics_in_documents %&gt;%
+  left_join(auto_topics, by=c(&quot;topic&quot; = &quot;old_topic&quot;)))</code></pre>
+<pre><code>## # A tibble: 1,380 x 4
+##    document topic      gamma new_topic          
+##    &lt;chr&gt;    &lt;int&gt;      &lt;dbl&gt; &lt;chr&gt;              
+##  1 1981         1 0.00000605 nuclear-weapon-peac
+##  2 2017         1 1.00       nuclear-weapon-peac
+##  3 1954         1 0.00000871 nuclear-weapon-peac
+##  4 1925         1 0.00000659 nuclear-weapon-peac
+##  5 1926         1 0.00000659 nuclear-weapon-peac
+##  6 1968         1 0.00000735 nuclear-weapon-peac
+##  7 2013         1 0.0000123  nuclear-weapon-peac
+##  8 1988         1 0.00442    nuclear-weapon-peac
+##  9 1953         1 0.00000541 nuclear-weapon-peac
+## 10 2016         1 0.0000106  nuclear-weapon-peac
+## # ... with 1,370 more rows</code></pre>
+<p>Now we have our data in a familiar format we can subset and visualize. Perhaps we’d like to compare the topic distribution in several topics.</p>
+<pre class="r"><code>topics %&gt;%
+  filter(document %in% c(1977, 1985, 1996)) %&gt;%  # the documents we want to compare
+  ggplot(aes(new_topic, gamma, fill = document)) +
+  geom_col() +
+  coord_flip() +
+  facet_wrap(~ document, ncol = 3)</code></pre>
+<p><img src="7_topicmodelling_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>We can visualize the distribution of all topics over time.</p>
+<pre class="r"><code>topics %&gt;%
+  ggplot(aes(document, gamma)) +
+    geom_col(aes(group = new_topic, fill = new_topic)) +
+    scale_x_discrete(breaks = seq(1905, 2019, 10))</code></pre>
+<p><img src="7_topicmodelling_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Or look at the distribution of specific topics over time.</p>
+<pre class="r"><code># This one requires a more balanced topic mixture to be very meaningful, which the Nobel corpus with its current fit does to have
+topics %&gt;%
+  filter(str_detect(new_topic, &quot;war&quot;)) %&gt;%
+  ggplot(aes(document, gamma)) +
+  geom_line(aes(group = new_topic, color = new_topic)) +
+  scale_x_discrete(breaks = seq(1905, 2019, 10))</code></pre>
+</div>
+<div id="stm" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> STM</h1>
+<p>There are several packages in R that fit topic models, most notably <code>stm</code> which is incorporates a host of handy visualization tools as well as the capacity to incorporate covariates into the model fit (<span class="citation">@roberts2019stm</span>).</p>
+<div id="excercises" class="section level2" number="3.1">
+<h2 number="3.1"><span class="header-section-number">3.1</span> Excercises</h2>
+<ul>
+<li>Run a topic model on the sustainability report corpus. How can we deal with year variables when they are not the name of the document?</li>
+<li>Experiment more with the Nobel corpus. Can you find a better/more meaningful model fit?</li>
+</ul>
+</div>
+</div>
+<div id="other-topic-modeling-resources" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Other topic modeling resources</h1>
+<p>This is only the most basic of introductions to topic modeling. For more information on topic modeling and analysis in the tidyverse, see chapter 6 of <span class="citation">@silge2017text</span>.</p>
+<p>For a good explainer on topic models, see <span class="citation">@underwood2012</span>.</p>
+</div>
+<div id="references" class="section level1" number="5">
+<h1 number="5"><span class="header-section-number">5</span> References</h1>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Perhaps the most popular topic modeling package in R has now become <code>stm</code> – see <a href="https://juliasilge.com/blog/sherlock-holmes-stm/">these</a> <a href="https://juliasilge.com/blog/evaluating-stm/">nice</a> blog posts by Julia Silge for examples of working with <code>stm</code> through <code>tidytext</code>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+
+<br><br><p>2021. <a href="mailto: gregory.fergusoncradler@inn.no">gregory.fergusoncradler@inn.no</a></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

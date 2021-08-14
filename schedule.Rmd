@@ -1,0 +1,54 @@
+---
+title: "Computational Text Analysis for Historians"
+subtitle: "NTNU, Trondheim"
+date: "August 12-13, 2021"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+---
+
+<h2>Schedule</h2>
+<br>
+
+<h3>Thursday, August 12</h3>
+
+9:00 – 9:30		Introductions and workshop goals [[PDF](Presentations/Introduction.pdf)]
+
+9:30 – 10:30		Session 1: Basics of R 
+
+10:30 – 10:45 		Break
+
+10:45 – 12:15		Session 2: Web scraping and reading documents into R
+
+12:15 – 1:15		Lunch
+
+1:15 – 3:00		Session 3: Cleaning and manipulating text in R
+
+3:00 – 3:30		Break
+
+3:30 – 5:00		Session 4: Word frequencies, word clouds, and basic counting 
+
+5:00 - 			Troubleshooting
+
+<br>
+
+<h3>Friday, August 13:</h3>
+
+9:00 – 10:30		Session 5: POS and dictionary methods
+
+10:30 – 10:45 		Break
+
+10:45 – 12:15		Session 6: Document similarity and co-occurrence
+
+12:15 – 1:15		Lunch
+
+1:15 – 3:00		Session 7: Topic models: theory and practice [[PDF](Presentations/Topic_models.pdf)]
+
+3:00 – 3:30		Break
+
+3:30 – 4:30		Continuation of Session 7
+
+4:30 – 5:15 	Conclusion: Word embedding, other methods of interest and ways and ways forward [[PDF](Presentations/Word_embedding.pdf)]

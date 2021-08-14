@@ -1,0 +1,296 @@
+\documentclass[t]{beamer}
+
+%bibliography
+%\usepackage[notes,backend=bibtex,isbn=false,doi=false,eprint=false, note=false, url=false]{biblatex-chicago}
+\usepackage[authordate-trad,backend=biber,isbn=false,doi=false,eprint=false, url=false]{biblatex-chicago}
+\bibliography{narrative}
+
+
+% customizing the title page
+\defbeamertemplate*{title page}{customized}[1][]
+{
+  \vspace{1cm}
+  \usebeamerfont{title}\inserttitle\par
+  \usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par
+  \vspace{3.5cm}
+  \usebeamerfont{date}\insertdate\par
+  \vspace{.5cm}
+  \usebeamerfont{author}\insertauthor\par
+  \usebeamerfont{institute}\insertinstitute\par
+  
+  
+  \usebeamercolor[fg]{titlegraphic}\inserttitlegraphic
+}
+
+\usepackage{graphicx}
+\usetheme[compress]{Dresden}
+\usecolortheme{dove}
+\usefonttheme{serif}
+%\usefonttheme{structureitalicserif}
+%\usepackage{helvet}
+%\usefonttheme{professionalfonts}
+%gets rid of bottom navigation bars
+\setbeamertemplate{footline}[frame number]{}
+\usepackage[utf8]{inputenc}
+%\usepackage[norsk]{babel}
+\usepackage{appendix}
+\usepackage[export]{adjustbox}
+\usepackage{wrapfig}
+\setbeamertemplate{caption}{\insertcaption}
+\usepackage{tikz}
+\usepackage{multirow} % to have tables with rows over multiple lines
+
+\title{\huge Computational text analysis for historians}
+\subtitle{What? How? (and a little bit why?)}
+%\vspace{6cm} % this doesn't seem to do anything...
+\author{Gregory Ferguson-Cradler}
+\institute{Institutt for rettsvitenskap, filosofi og internasjonale studier \\ Høgskolen i Innlandet, Lillehammer}
+\date{NTNU, Trondheim, 12.-13. August 2021} %\today}
+
+% \AtBeginSection[]
+% {
+% \begin{frame}<beamer>{Overview}
+% \tableofcontents[currentsection, %currentsubsection, currentsubsubsection,
+%     %hideothersubsections, 
+%     sectionstyle=show/shaded,
+% ]
+% \end{frame}
+% }
+ 
+\begin{document}
+
+\begin{frame}[plain]
+    \titlepage    
+\end{frame}
+
+\begin{frame}[plain]
+\centering
+\vspace*{\fill}
+\large{What is out there?}
+\vspace*{\fill}
+\end{frame}
+
+\section{Typologies of digital text analysis}
+\subsection{Word counts and dictionaries}
+\begin{frame}{Word counts and dictionaries\footnote{The following overview follows a longer, more detailed survey of use of computational text analysis methods in a forthcoming paper \autocite{ferguson}. I've included a pre-print in the workshop Github repository.}}
+    \begin{itemize}
+        \item Just counting words! (First project in digital humanities \autocite{graham2020exploring})
+        \item The well-known Google n-gram 
+        \item Dictionaries for scoring texts (also used for text classification)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Word frequency and dictionary methods in practice}
+\vspace*{\fill}
+\begin{tabular}{lr}
+\adjincludegraphics[width=.60\linewidth, valign=c]{blevins.jpg} & 
+\begin{minipage}{0.4\textwidth}
+\begin{itemize}
+%\setlength{\itemindent}{1cm}
+    \item Tracking news attention in 19th-century America \autocite{blevins2014space}
+    \item Randomize newspaper articles
+    \item Hand-counting 
+    \item Mapping of American media attention
+\end{itemize}
+  \end{minipage}
+  \end{tabular}
+  \vspace*{\fill}
+  \end{frame}
+  
+\begin{frame}{Word frequency and dictionary methods in practice, II}
+\vspace*{\fill}
+\begin{tabular}{lr}
+\adjincludegraphics[width=.5\linewidth, valign=c]{wilkens.jpg} & 
+\begin{minipage}{0.4\textwidth}
+\begin{itemize}
+%\setlength{\itemindent}{1cm}
+    \item Geographical imagination in American 19th-century fiction \autocite{wilkens2013geographic}
+\end{itemize}
+  \end{minipage}
+  \end{tabular}
+  \vspace*{\fill}
+  \end{frame}
+
+\begin{frame}{Word frequency and dictionary methods in practice, III}
+\vspace*{\fill}
+\begin{tabular}{lr}
+\adjincludegraphics[width=.6\linewidth, valign=c]{alsvik.jpg} & 
+\begin{minipage}{0.4\textwidth}
+\begin{itemize}
+%\setlength{\itemindent}{1cm}
+    \item Tracking attention to ``public'' and ``private spheres'' in Norwegian regional historiography using dictionary word counts \autocite{alsvik2020historiografi}
+\end{itemize}
+  \end{minipage}
+  \end{tabular}
+  \vspace*{\fill}
+  \end{frame}
+
+\begin{frame}{Word frequency and dictionary methods in practice, IV}
+\vspace*{\fill}
+\begin{tabular}{lr}
+\adjincludegraphics[width=.5\linewidth, valign=c]{guldi.jpg} & 
+\begin{minipage}{0.4\textwidth}
+\begin{itemize}
+%\setlength{\itemindent}{1cm}
+    \item Shifting notions of ``modernity'' via bigram frequency counts \autocite{guldi2019measures}
+\end{itemize}
+  \end{minipage}
+  \end{tabular}
+  \vspace*{\fill}
+  \end{frame}
+
+\subsection{Document similarity}
+\begin{frame}{Document similarity}
+    \begin{itemize}
+        \item Tracing how similar documents are to each other
+        \item Multiple ways to do this: counting text chunks that are exactly the same, charting document similarity over all vocabulary
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Document similarity methods in practice}
+\vspace*{\fill}
+\begin{tabular}{lr}
+\adjincludegraphics[width=.6\linewidth, valign=c]{funk.jpg} & 
+\begin{minipage}{0.4\textwidth}
+\begin{itemize}
+%\setlength{\itemindent}{1cm}
+    \item Civil code adoption that can be uncovered by looking for identical sections of civil codes in 19th-century United States \autocite{funk2018spine}
+\end{itemize}
+  \end{minipage}
+  \end{tabular}
+  \vspace*{\fill}
+  \end{frame}
+
+\begin{frame}{Document similarity methods in practice, II}
+\vspace*{\fill}
+\begin{tabular}{lr}
+\adjincludegraphics[width=.6\linewidth, valign=c]{simil1.jpeg} &
+\\
+\adjincludegraphics[width=.6\linewidth, valign=c]{simil2.jpeg}
+\begin{minipage}{0.4\textwidth}
+\begin{itemize}
+%\setlength{\itemindent}{1cm}
+    \item Tracing vocabulary similarity in vector space of statements in the German Bundestag by party \autocite{ferguson}
+\end{itemize}
+  \end{minipage}
+  \end{tabular}
+  \vspace*{\fill}
+  \end{frame}
+
+\subsection{Topic models}
+\begin{frame}{Document similarity}
+    \begin{itemize}
+        \item Tracing themes/topics through documents
+        \item Each text is seen as a mixture of topics, and each topic as a mixture of words
+        \item Long been the most visible and well-known method in digital humanities
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Topic models in practice}
+\vspace*{\fill}
+\begin{tabular}{lr}
+\adjincludegraphics[width=.6\linewidth, valign=c]{wehrheim.jpg} & 
+\begin{minipage}{0.4\textwidth}
+\begin{itemize}
+%\setlength{\itemindent}{1cm}
+    \item Topic modeling the \textit{Journal of Economic History } to find shift in language to quantification as a topic \autocite{wehrheim2019economic}
+\end{itemize}
+  \end{minipage}
+  \end{tabular}
+  \vspace*{\fill}
+  \end{frame}
+
+\begin{frame}{Topic models in practice, II}
+\vspace*{\fill}
+\begin{tabular}{lr}
+\adjincludegraphics[width=.6\linewidth, valign=c]{miller.jpg} & 
+\begin{minipage}{0.4\textwidth}
+\begin{itemize}
+%\setlength{\itemindent}{1cm}
+    \item Topic models to reconstruct a ``crime rate'' for 19th-century China \autocite{miller2013rebellion}
+\end{itemize}
+  \end{minipage}
+  \end{tabular}
+  \vspace*{\fill}
+  \end{frame}
+
+\begin{frame}{Topic models in practice, III}
+\vspace*{\fill}
+\begin{tabular}{lr}
+\adjincludegraphics[width=.6\linewidth, valign=c]{guldi2.jpg} & 
+\begin{minipage}{0.4\textwidth}
+\begin{itemize}
+%\setlength{\itemindent}{1cm}
+    \item What was the British state talking about when it was talking about infrastructure? \autocite{guldi2019parliament}
+\end{itemize}
+  \end{minipage}
+  \end{tabular}
+  \vspace*{\fill}
+  \end{frame}
+
+\subsection{Word embedding and other frontier methods}
+\begin{frame}{Word embedding}
+    \begin{itemize}
+        \item Represents words as vectors in many-dimensional vector space
+        \item Dimension reduction can be used to plot words in relation to each other (over time or space)
+        \item Axes that correspond with meaning can be constructed and words placed on this spectrum
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Word embedding in practice}
+\vspace*{\fill}
+\begin{tabular}{lr}
+\adjincludegraphics[width=.6\linewidth, valign=c]{kulkarni.jpg} & 
+\begin{minipage}{0.4\textwidth}
+\begin{itemize}
+%\setlength{\itemindent}{1cm}
+    \item Visualizing the changing meaning of words over time \autocite{kulkarni2015statistically}
+\end{itemize}
+  \end{minipage}
+  \end{tabular}
+  \vspace*{\fill}
+  \end{frame}
+
+\section{Workshop plan}
+\begin{frame}{Workshop goals}
+    \begin{itemize}
+        \item How to read documents into R
+        \item How to make analyze and visualize word frequency
+        \item Use dictionaries to track word use, do sentiment categorization
+        \item Do basic document similarity analysis and topic modeling
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Workshop schedule: Thursday, December 12}
+\begin{tabular}{l p{0.8\linewidth}}
+9:00 – 9:30		&       Introductions and workshop goals \\
+9:30 – 10:30	&	    Session 1: Basics of R \\
+10:30 – 10:45 	&	    Break \\
+10:45 – 12:15	&	    Session 2: Web scraping and reading documents into R  \\
+12:15 – 1:15	&	    Lunch  \\
+1:15 – 3:00		&       Session 3: Cleaning and manipulating text in R \\
+3:00 – 3:30		&       Break \\
+3:30 – 5:00	    &	    Session 4: Word frequencies, word clouds, and basic counting \\
+5:00 -- 		&       Troubleshooting \\
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Workshop schedule: Friday, December 13}
+\begin{tabular}{l p{0.8\linewidth}}
+9:00 – 10:30	&	Session 5: n-grams, word/document correlations, sentiment analysis \\
+10:30 – 10:45 	&	Break \\
+10:45 – 12:15	&	Session 6: Document similarity and dictionaries \\
+12:15 – 1:15	&	Lunch \\
+1:15 – 3:00		 &   Session 7: Topic models: theory and practice \\
+3:00 – 3:30		  &  Break \\
+3:30 – 4:30		   & Continuation of Session 7: Topic models \\
+4: 30 – 5:15		&Conclusion: Discussion of other techniques of possible interest and conclusion \\
+\end{tabular}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+\printbibliography
+\end{frame}
+
+\end{document}
+

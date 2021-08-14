@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Session 3: Cleaning and manipulating text in R</title>
+
+<script src="site_libs/header-attrs-2.9/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/clipboard-1.7.1/clipboard.min.js"></script>
+<link href="site_libs/primer-tooltips-1.4.0/build.css" rel="stylesheet" />
+<link href="site_libs/klippy-0.0.0.9500/css/klippy.min.css" rel="stylesheet" />
+<script src="site_libs/klippy-0.0.0.9500/js/klippy.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Overview
+  </a>
+</li>
+<li>
+  <a href="schedule.html">
+    <span class="fa fa-info"></span>
+     
+    Schedule
+  </a>
+</li>
+<li>
+  <a href="1_RBasics.html">
+    <span class="fa fa-book"></span>
+     
+    Session 1
+  </a>
+</li>
+<li>
+  <a href="2_ScrapingAndReadingInDocuments.html">
+    <span class="fa fa-book"></span>
+     
+    Session 2
+  </a>
+</li>
+<li>
+  <a href="3_CleaningAndManipulating.html">
+    <span class="fa fa-book"></span>
+     
+    Session 3
+  </a>
+</li>
+<li>
+  <a href="4_WordFreq.html">
+    <span class="fa fa-book"></span>
+     
+    Session 4
+  </a>
+</li>
+<li>
+  <a href="5_SentAndDict.html">
+    <span class="fa fa-book"></span>
+     
+    Session 5
+  </a>
+</li>
+<li>
+  <a href="6_DocSimil.html">
+    <span class="fa fa-book"></span>
+     
+    Session 6
+  </a>
+</li>
+<li>
+  <a href="7_topicmodelling.html">
+    <span class="fa fa-book"></span>
+     
+    Session 7
+  </a>
+</li>
+<li>
+  <a href="8_WordEmbedding.html">
+    <span class="fa fa-book"></span>
+     
+    Session 8
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Session 3: Cleaning and manipulating text in R</h1>
+
+</div>
+
+
+<script>
+  addClassKlippyTo("pre.r, pre.markdown");
+  addKlippy('right', 'top', 'auto', '1', 'Copy code', 'Copied!');
+</script>
+<div id="types-of-cleaning" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Types of cleaning</h1>
+<p>As we’ve seen already, almost always when documents in the real world are read into R they are highly imperfect. They will have all kinds of crazy tags, whitespaces (which also show up as tags under some viewing methods), and other things we may want to strip. In fact, in the real world collecting and cleaning data generally takes at least as long as analysis. A fairly balanced workshop on text analysis would probably rightly spend at least half of its time on these issues and less on analytics. We’ll get on to analytics in the next section but it’s important to realize that these initial ones are just as important, even if they seem a little dull and uninspiring.</p>
+<p>We’ll use two sample corpora as examples and test corpora for the rest of the workshop. The first is Nobel Peace Prize award ceremony speeches since 1905. They are scraped from <a href="https://www.nobelprize.org" class="uri">https://www.nobelprize.org</a> using the slightly more advanced methods than we’ll discuss here. For code and brief discussion, see the <a href="#Appendix">Appendix</a>. The second is a corpus of Sustainability Reports for several major international oil companies.</p>
+<pre class="r"><code>library(tidyverse)
+nobel &lt;- read_csv(&quot;data/NobelPeace.csv&quot;, locale=locale(encoding = &quot;latin1&quot;)) %&gt;%
+  select(!X1)</code></pre>
+<pre><code>## Warning: Missing column names filled in: &#39;X1&#39; [1]</code></pre>
+<pre class="r"><code>sr &lt;- read_csv(&quot;data/srps.csv&quot;)</code></pre>
+</div>
+<div id="viewing-your-tibble-corpus" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Viewing your tibble corpus</h1>
+<p>So after the first two sessions we’re assuming we have our corpus in a tibble, with one column being the text of the documents and other columns of metadata – year and company for the Social Responsibility reports, laureate and year for our Nobel Peace Prize award speeches. First things first, there are numerous ways to try to get an overview of the data. If you just enter the dataframe’s name in R you will get the first few lines. Alternately, you can use <code>print()</code> – tibbles are <a href="https://tibble.tidyverse.org/reference/formatting.html">build</a> to make printing and viewing dataframes easier. If we want to print all rows (you have to be careful with this, if you have millions of rows this will probably crash R) we can do this.</p>
+<pre class="r"><code>nobel # note that this tells you the datatype of each column</code></pre>
+<pre><code>## # A tibble: 92 x 3
+##     Year Laureate                                                 AwardSpeech   
+##    &lt;dbl&gt; &lt;chr&gt;                                                    &lt;chr&gt;         
+##  1  1905 Bertha von Suttner                                       &quot;  On behalf ~
+##  2  1906 Theodore Roosevelt                                       &quot;As the Nobel~
+##  3  1907 Ernesto Teodoro Moneta, Louis Renault                    &quot;Ernesto Teod~
+##  4  1908 Klas Pontus Arnoldson, Fredrik Bajer                     &quot;On behalf of~
+##  5  1909 Auguste Beernaert, Paul Henri d&#39;Estournelles de Constant &quot;Auguste Beer~
+##  6  1910 Permanent International Peace Bureau                     &quot;Chairman of ~
+##  7  1911 Tobias Asser, Alfred Fried                               &quot;Tobias Micha~
+##  8  1912 Elihu Root                                               &quot;Elihu Root w~
+##  9  1913 Henri La Fontaine                                        &quot;Henri La Fon~
+## 10  1922 Fridtjof Nansen                                          &quot;I take pleas~
+## # ... with 82 more rows</code></pre>
+<pre class="r"><code>print(nobel, n = Inf)</code></pre>
+<pre><code>## # A tibble: 92 x 3
+##     Year Laureate                          AwardSpeech                          
+##    &lt;dbl&gt; &lt;chr&gt;                             &lt;chr&gt;                                
+##  1  1905 Bertha von Suttner                &quot;  On behalf of the Nobel Committee,~
+##  2  1906 Theodore Roosevelt                &quot;As the Nobel   Committee meets toda~
+##  3  1907 Ernesto Teodoro Moneta, Louis Re~ &quot;Ernesto Teodoro Moneta was born in ~
+##  4  1908 Klas Pontus Arnoldson, Fredrik B~ &quot;On behalf of the Nobel Committee of~
+##  5  1909 Auguste Beernaert, Paul Henri d&#39;~ &quot;Auguste Beernaert was born in 18281~
+##  6  1910 Permanent International Peace Bu~ &quot;Chairman of the Committee Løvland t~
+##  7  1911 Tobias Asser, Alfred Fried        &quot;Tobias Michael Carel Asser was born~
+##  8  1912 Elihu Root                        &quot;Elihu Root was born on February 15,~
+##  9  1913 Henri La Fontaine                 &quot;Henri La Fontaine is the true leade~
+## 10  1922 Fridtjof Nansen                   &quot;I take pleasure in announcing that ~
+## 11  1925 Sir Austen Chamberlain, Charles ~ &quot;We still remember it vividly, that ~
+## 12  1926 Aristide Briand, Gustav Stresema~ &quot;We still remember it vividly, that ~
+## 13  1927 Ferdinand Buisson, Ludwig Quidde  &quot;The Nobel Committee has awarded the~
+## 14  1929 Frank B. Kellogg                  &quot;  It might appear that this year\u0~
+## 15  1930 Nathan Söderblom                  &quot;  It might appear that this year\u0~
+## 16  1931 Jane Addams, Nicholas Murray But~ &quot;In awarding the Peace Prize to two ~
+## 17  1933 Sir Norman Angell                 &quot;In the work for international peace~
+## 18  1934 Arthur Henderson                  &quot;It is not my task today to present ~
+## 19  1935 Carl von Ossietzky                &quot;Carl von Ossietzky, who has been aw~
+## 20  1936 Carlos Saavedra Lamas             &quot;The Nobel Peace Prize for 1936 has ~
+## 21  1937 Robert Cecil                      &quot;Three statesmen who occupied leadin~
+## 22  1938 Nansen International Office for ~ &quot;This year, as we all know, the Nobe~
+## 23  1944 International Committee of the R~ &quot;  Six years have passed since we la~
+## 24  1945 Cordell Hull                      &quot;Cordell Hull has devoted his entire~
+## 25  1946 Emily Greene Balch, John R. Mott  &quot;The environment in which a child is~
+## 26  1947 Friends Service Council, America~ &quot;  The Nobel Committee of the Norweg~
+## 27  1949 Lord Boyd Orr                     &quot;Lord Boyd Orr occupies a unique pla~
+## 28  1950 Ralph Bunche                      &quot;  Dr. Ralph Bunche was born forty-s~
+## 29  1951 Léon Jouhaux                      &quot;Alfred Nobel\u0092s Peace Prize is ~
+## 30  1952 Albert Schweitzer                 &quot;Albert Schweitzer was born in Alsac~
+## 31  1953 George C. Marshall                &quot;When Cadet First Captain George Cat~
+## 32  1954 Office of the United Nations Hig~ &quot;  The Nobel Committee of the Norweg~
+## 33  1957 Lester Bowles Pearson             &quot;The Nobel Committee of the Norwegia~
+## 34  1958 Georges Pire                      &quot;  The Nobel Committee of the Norweg~
+## 35  1959 Philip Noel-Baker                 &quot;Frequently when the storm clouds ga~
+## 36  1960 Albert Lutuli                     &quot;  This year the Nobel Committee of ~
+## 37  1961 Dag Hammarskjöld                  &quot;The Nobel   Committee of the Norweg~
+## 38  1962 Linus Pauling                     &quot;Shortly after the atomic bombs were~
+## 39  1963 International Committee of the R~ &quot;The Nobel   Committee of the Norweg~
+## 40  1964 Martin Luther King Jr.            &quot;  Not many years have passed since ~
+## 41  1965 United Nations Children&#39;s Fund    &quot;The death of Alfred Nobel at San Re~
+## 42  1968 René Cassin                       &quot;The last time the Nobel Peace Prize~
+## 43  1969 International Labour Organization &quot;When Alfred Nobel died on December ~
+## 44  1970 Norman Borlaug                    &quot;In the will and testament drawn up ~
+## 45  1971 Willy Brandt                      &quot;  The 1971 Nobel Peace Prize was aw~
+## 46  1973 Henry Kissinger, Le Duc Tho       &quot;Your Majesty, Your Royal Highnesses~
+## 47  1974 Seán MacBride, Eisaku Sato        &quot;Your Majesty, Your Royal Highnesses~
+## 48  1975 Andrei Sakharov                   &quot;Translation Your Majesty, Your Roya~
+## 49  1976 Betty Williams, Mairead Corrigan  &quot;Translation Your Majesty, Your Roya~
+## 50  1977 Amnesty International             &quot;Translation Your Majesty, Your Roya~
+## 51  1978 Anwar al-Sadat, Menachem Begin    &quot;Translation Your Majesty, Your Roya~
+## 52  1979 Mother Teresa                     &quot;Translation Your Majesty, Your Roya~
+## 53  1980 Adolfo Pérez Esquivel             &quot;Translation Your Majesty, Your Roya~
+## 54  1981 Office of the United Nations Hig~ &quot;Your Majesty, Your Royal Highnesses~
+## 55  1982 Alva Myrdal, Alfonso García Robl~ &quot;Translation Your Majesty, Your Roya~
+## 56  1983 Lech Walesa                       &quot;Your Majesty, Your Royal Highnesses~
+## 57  1984 Desmond Tutu                      &quot;Your Majesty, Your Royal Highnesses~
+## 58  1985 International Physicians for the~ &quot;Your Majesty, Your Royal Highnesses~
+## 59  1986 Elie Wiesel                       &quot;Your Majesty, Your Royal Highnesses~
+## 60  1987 Oscar Arias Sánchez               &quot;Your Majesty, Your Royal Highnesses~
+## 61  1988 United Nations Peacekeeping Forc~ &quot;Your Majesty, Your Royal Highnesses~
+## 62  1989 The 14th Dalai Lama               &quot;The Nobel Peace Prize is one of six~
+## 63  1990 Mikhail Gorbachev                 &quot;Your Royal Highnesses, Your Excelle~
+## 64  1991 Aung San Suu Kyi                  &quot;Your Majesties, Your Excellencies, ~
+## 65  1992 Rigoberta Menchú Tum              &quot;Your Majesties, Your Excellencies, ~
+## 66  1993 Nelson Mandela, F.W. de Klerk     &quot;Your Majesties, Excellencies, Ladie~
+## 67  1994 Yasser Arafat, Shimon Peres, Yit~ &quot;Your Majesties, Your Excellencies, ~
+## 68  1995 Joseph Rotblat, Pugwash Conferen~ &quot;Your Majesties, Your Excellencies, ~
+## 69  1996 Carlos Filipe Ximenes Belo, José~ &quot;Translation of the Norwegian text Y~
+## 70  1997 International Campaign to Ban La~ &quot;Translation of the Norwegian text. ~
+## 71  1998 John Hume, David Trimble          &quot;Translation of the Norwegian text. ~
+## 72  1999 Médecins Sans Frontières          &quot;Translation of the Norwegian text. ~
+## 73  2000 Kim Dae-jung                      &quot;  Translation of the Norwegian text~
+## 74  2001 United Nations, Kofi Annan        &quot;  Translation of the Norwegian text~
+## 75  2002 Jimmy Carter                      &quot;Translation of the Norwegian text. ~
+## 76  2003 Shirin Ebadi                      &quot;Translation of the Norwegian text. ~
+## 77  2004 Wangari Maathai                   &quot;English Norwegian Your Majesties, Y~
+## 78  2005 International Atomic Energy Agen~ &quot;Your Majesties, Your Royal Highness~
+## 79  2006 Muhammad Yunus, Grameen Bank      &quot;Your Majesties, Your Royal Highness~
+## 80  2007 Intergovernmental Panel on Clima~ &quot;Norwegian  Your Majesties, Your Roy~
+## 81  2008 Martti Ahtisaari                  &quot;Norwegian  Your Majesties, Your Roy~
+## 82  2009 Barack H. Obama                   &quot;© THE NOBEL FOUNDATION 2009\r\nGene~
+## 83  2010 Liu Xiaobo                        &quot;Your Majesties, Excellencies, Ladie~
+## 84  2011 Ellen Johnson Sirleaf, Leymah Gb~ &quot;Your Majesties, Your Royal Highness~
+## 85  2012 European Union (EU)               &quot;Your Majesties, Your Royal Highness~
+## 86  2013 Organisation for the Prohibition~ &quot;Your Majesties, Your Royal Highness~
+## 87  2014 Kailash Satyarthi, Malala Yousaf~ &quot;NorwegianEnglish © THE NOBEL FOUNDA~
+## 88  2015 National Dialogue Quartet         &quot;Your Majesties, Your Royal Highness~
+## 89  2016 Juan Manuel Santos                &quot;NorwegianEnglishSpanish Berit Reiss~
+## 90  2017 International Campaign to Abolis~ &quot;NorwegianEnglish © THE NOBEL FOUNDA~
+## 91  2018 Denis Mukwege, Nadia Murad        &quot;NorwegianEnglishFrenchArabic (pdf) ~
+## 92  2019 Abiy Ahmed Ali                    &quot;Your Majesties, Your Royal Highness~</code></pre>
+<p>Other options are <code>glimpse()</code> (tidyverse) and <code>str()</code> (baseR) that give you different ways to visualize a bit. Often the easiest is to ask R to open a separate window with <code>View()</code>. Finally, sometimes if you have a long character string the easiest way to inspect it is simply to print it out separately. Using the <code>cat()</code> command will format using the formatting tags in the text – it will look nicer but you might want to know where the /n and /t tags (newline and tab markers) are.</p>
+<pre class="r"><code>#View(nobel) # opens a new window
+nobel$AwardSpeech[4] # will show the fourth line of the text column of the nobel dataframe</code></pre>
+<pre><code>## [1] &quot;On behalf of the Nobel Committee of the Norwegian Parliament, I have the honor to extend a welcome to all who have assembled here on this occasion commemorating the great Swedish patron and benefactor, Alfred Nobel, who gave the whole of his large fortune to the solution of problems concerning the future fate of mankind. Since we last met here, one of the winners of the Peace Prize, Randal Cremer, has left us forever1; but he has left behind the memory of a great personality and of a warm friend of peace and of mankind. I invite you all to honor his memory by standing. This year the Nobel Committee has unanimously decided to divide the Peace Prize between former member of the Swedish Parliament, K.P. Arnoldson, and former member of the Danish Parliament, Fredrik Bajer. It is a great pleasure for the Committee to award the prize to these gentlemen, since it is convinced that its choice accords with the general desire in the Scandinavian countries. They have both been untiring advocates of the ideals of peace. K.P. Arnoldson was born in Gothenburg in 1844 and in his youth was in the service of the Swedish Railways. At the same time, however, he also worked for the press as a journalist and author, one of his favorite subjects even then being the cause of peace. From 1882 to 1887 Arnoldson was a member of the Lower House of the Swedish Parliament; In 1883 he put forward a proposal for an address to the king, petitioning for a declaration of permanent neutrality by Sweden. The proposal was not adopted, but the House recommended that the government should continue to work along the lines of the proposal. In the same year Arnoldson helped to found the Swedish Peace and Arbitration Association [Svenska freds-och skiljedomsföreningen], which recently celebrated its twenty-fifth anniversary. Arnoldson was secretary of the association for the first few years and edited its paper. Arnoldson&lt;U+0092&gt;s work also extended to Norway. The success of his speeches in several of our cities in 1889 and 1890 indirectly encouraged Parliament in 1890 to adopt his arbitration address to the king. Arnoldson has published a number of important works on peace, several of which have been translated into other languages. His most important is The Hope of the Centuries: A Book on World Peace, an account of the growth of the idea of peace among nations and in international relations. Mr. Arnoldson, along with Mr. Fredrik Bajer, was nominated for the Nobel Peace Prize this year with the unanimous support of the Swedish Interparliamentary Group and a number of Norwegian members of Parliament.      *  *  * Fredrik Bajer was born in 1837. Like Tolstoy and many other fighters for peace, he began his career as an officer and from 1856 to 1865 was a lieutenant of Dragoons. He then began his study of foreign languages, becoming an elementary school teacher and later a translator. Already in the 1860&lt;U+0092&gt;s he was maintaining contact with the peace movement and was in touch with Frédéric Passy, who in 1867 founded the first French peace society1. From 1872 to 1895, Bajer was a member of Parliament for Horsens and during that time did much work for the cause of peace and for women&lt;U+0092&gt;s rights. Mr. Bajer has been an extraordinarily prolific writer, and in his many articles and pamphlets about and in favor of the cause of peace, he has dealt with practically all the problems involved in the peace movement. Norwegian newspapers have also enjoyed the benefit of his able pen. Special mention should be made of his great study of the question of neutrality. In 1882 he was also responsible for the foundation of a peace society in Denmark, at first called the Society for the Promotion of Danish Neutrality and later the Danish Peace Society2. At a very early date Mr. Bajer took an active part in the European peace movement. In 1884 he participated in the International Congress in Bern and in 1889 he took part both in the International Congress and in the Interparliamentary Conference, held during the Great Exhibition in Paris; since then there have been few of these meetings in which he has not participated. It was at his instigation and suggestion that in 1891 a permanent International Peace Bureau was established in Bern. Bajer was president of its Board of Administration until last year when he declined reelection and was instead named honorary president. Since 1891 Bajer has also had a seat on the council which controls the Interparliamentary Union. He has always shown a great interest in cooperation between the Nordic countries in the cause of peace. He has invariably taken part in the Nordic peace meetings, and it is mainly due to his efforts that a Nordic Interparliamentary Union has been founded3. Fredrik Bajer was nominated this year as a candidate for the Nobel Peace Prize by the Danish Interparliamentary Group, among others, and, together with K.P. Arnoldson, by the Swedish Interparliamentary Group and a number of members of the Norwegian Parliament.&quot;</code></pre>
+<pre class="r"><code>cat(nobel$AwardSpeech[4]) # nicer formatting but now you&#39;re not seeing formatting tags in the text</code></pre>
+<pre><code>## On behalf of the Nobel Committee of the Norwegian Parliament, I have the honor to extend a welcome to all who have assembled here on this occasion commemorating the great Swedish patron and benefactor, Alfred Nobel, who gave the whole of his large fortune to the solution of problems concerning the future fate of mankind. Since we last met here, one of the winners of the Peace Prize, Randal Cremer, has left us forever1; but he has left behind the memory of a great personality and of a warm friend of peace and of mankind. I invite you all to honor his memory by standing. This year the Nobel Committee has unanimously decided to divide the Peace Prize between former member of the Swedish Parliament, K.P. Arnoldson, and former member of the Danish Parliament, Fredrik Bajer. It is a great pleasure for the Committee to award the prize to these gentlemen, since it is convinced that its choice accords with the general desire in the Scandinavian countries. They have both been untiring advocates of the ideals of peace. K.P. Arnoldson was born in Gothenburg in 1844 and in his youth was in the service of the Swedish Railways. At the same time, however, he also worked for the press as a journalist and author, one of his favorite subjects even then being the cause of peace. From 1882 to 1887 Arnoldson was a member of the Lower House of the Swedish Parliament; In 1883 he put forward a proposal for an address to the king, petitioning for a declaration of permanent neutrality by Sweden. The proposal was not adopted, but the House recommended that the government should continue to work along the lines of the proposal. In the same year Arnoldson helped to found the Swedish Peace and Arbitration Association [Svenska freds-och skiljedomsföreningen], which recently celebrated its twenty-fifth anniversary. Arnoldson was secretary of the association for the first few years and edited its paper. Arnoldson&lt;U+0092&gt;s work also extended to Norway. The success of his speeches in several of our cities in 1889 and 1890 indirectly encouraged Parliament in 1890 to adopt his arbitration address to the king. Arnoldson has published a number of important works on peace, several of which have been translated into other languages. His most important is The Hope of the Centuries: A Book on World Peace, an account of the growth of the idea of peace among nations and in international relations. Mr. Arnoldson, along with Mr. Fredrik Bajer, was nominated for the Nobel Peace Prize this year with the unanimous support of the Swedish Interparliamentary Group and a number of Norwegian members of Parliament.      *  *  * Fredrik Bajer was born in 1837. Like Tolstoy and many other fighters for peace, he began his career as an officer and from 1856 to 1865 was a lieutenant of Dragoons. He then began his study of foreign languages, becoming an elementary school teacher and later a translator. Already in the 1860&lt;U+0092&gt;s he was maintaining contact with the peace movement and was in touch with Frédéric Passy, who in 1867 founded the first French peace society1. From 1872 to 1895, Bajer was a member of Parliament for Horsens and during that time did much work for the cause of peace and for women&lt;U+0092&gt;s rights. Mr. Bajer has been an extraordinarily prolific writer, and in his many articles and pamphlets about and in favor of the cause of peace, he has dealt with practically all the problems involved in the peace movement. Norwegian newspapers have also enjoyed the benefit of his able pen. Special mention should be made of his great study of the question of neutrality. In 1882 he was also responsible for the foundation of a peace society in Denmark, at first called the Society for the Promotion of Danish Neutrality and later the Danish Peace Society2. At a very early date Mr. Bajer took an active part in the European peace movement. In 1884 he participated in the International Congress in Bern and in 1889 he took part both in the International Congress and in the Interparliamentary Conference, held during the Great Exhibition in Paris; since then there have been few of these meetings in which he has not participated. It was at his instigation and suggestion that in 1891 a permanent International Peace Bureau was established in Bern. Bajer was president of its Board of Administration until last year when he declined reelection and was instead named honorary president. Since 1891 Bajer has also had a seat on the council which controls the Interparliamentary Union. He has always shown a great interest in cooperation between the Nordic countries in the cause of peace. He has invariably taken part in the Nordic peace meetings, and it is mainly due to his efforts that a Nordic Interparliamentary Union has been founded3. Fredrik Bajer was nominated this year as a candidate for the Nobel Peace Prize by the Danish Interparliamentary Group, among others, and, together with K.P. Arnoldson, by the Swedish Interparliamentary Group and a number of members of the Norwegian Parliament.</code></pre>
+<div id="white-spaces-urls-tags-etc." class="section level2" number="2.1">
+<h2 number="2.1"><span class="header-section-number">2.1</span> White spaces, urls, tags, etc.</h2>
+<p>As noted, we might well want to strip artefacts of the scanning and importing process so we only have the text itself. Looking at our <code>nobel$AwardSpeech[1]</code> call above we see some s, ’s, s. These are <a href="https://en.wikipedia.org/wiki/Escape_character">escape characters</a>. To see what they do:</p>
+<pre class="r"><code>test &lt;- &quot;     Here \n there and \t\t\t everywhere.\n&quot;
+print(test)</code></pre>
+<pre><code>## [1] &quot;     Here \n there and \t\t\t everywhere.\n&quot;</code></pre>
+<pre class="r"><code>cat(test)</code></pre>
+<pre><code>##      Here 
+##  there and            everywhere.</code></pre>
+<p>There are also things like <code>\u0092</code> that are charcter encodings that have gotten garbled – this one representing an apostrophe. We also might want to look for where there is more than one space and replace it with one, remove white space at the beginning… and so on. We can use stringr’s <code>str_replace_all</code> to do all this and utilize our knowledge of regular expressions (the stringr <a href="https://stringr.tidyverse.org/">documentation</a> and cheatsheet are especially helpful).</p>
+<pre class="r"><code># Practice on our small test string
+test &lt;- &quot;     Here \n there and \t\t\t everywhere.\n&quot;
+test_clean &lt;- str_replace_all(test, &quot;[(\\n)(\\r)(\\t)]&quot;, &#39; &#39;)
+test_clean &lt;- str_replace_all(test_clean, &quot; {2,}&quot;, &quot; &quot;)
+test_clean &lt;- str_replace_all(test_clean, &quot;^ *| *$&quot;, &quot;&quot;)
+test_clean</code></pre>
+<pre><code>## [1] &quot;Here there and everywhere.&quot;</code></pre>
+<p>That removed all those spacing encodings and whitespace. But it won’t be any surprise to you anymore that the tidyverse actually makes this much easier for us.</p>
+<pre class="r"><code>str_squish(test) </code></pre>
+<pre><code>## [1] &quot;Here there and everywhere.&quot;</code></pre>
+<p>So that was simple. Now the unicode encodings from the Nobel speaches.</p>
+<pre class="r"><code>speech &lt;- nobel$AwardSpeech[1]
+str_replace(speech, &quot;\u0092&quot;, &quot;&#39;&quot;)</code></pre>
+<pre><code>## [1] &quot;  On behalf of the Nobel Committee, Bjørnstjerne Bjørnson introduced the speaker, Baroness Bertha von Suttner, to the audience. In a few words he recalled the great influence of the Baroness on the growth of the peace movement. While still young she had had the audacity to oppose the horrors of war1, and had done so in one of the most militaristic countries in Europe. She had continued this fight all her life and never wearied of crying &lt;U+0093&gt;Down with Arms&lt;U+0093&gt;2. Despite the laughter with which her words had been greeted in the beginning, they did receive a hearing because they were uttered by a person of noble character and because they proclaimed humanity&#39;s greatest cause. Many women had since followed in her footsteps and taken up the cause, and the call to lay down arms had become general. Moreover, to all men of goodwill the cause of peace and the women&lt;U+0092&gt;s cause were one and the same movement, striving for the same goal. When the cause of peace prevailed, then too would the women&lt;U+0092&gt;s cause be won. * * * History constantly demonstrates the great influence of women. Women have encouraged the ideas of war, the attitude to life, and the causes for which men have fought, for which their sons were brought up, and of which they have dreamed. Any change or reformation of these ideas must be brought about chiefly by women. The human ideal of manly courage and manly deeds must become more enlightened; the faithful worker in all spiritual and material spheres of life must displace the bloodstained hero as the true ideal. Women will cooperate to give men higher aims, to give their sons nobler dreams. Many are the individual women who have set an example in sacrifice and work, who have followed the armies as angels of consolation and healing, tending the sick and suffering. How much more effective it is to do one&lt;U+0092&gt;s utmost to prevent misfortune! This is where you, Madame Baroness, have taken the lead among women of today. You have attacked war itself and cried to the nations: &lt;U+0093&gt;Down with arms!&lt;U+0094&gt; This call will be your eternal honor. Beginning as a murmur in the corn on a summer&lt;U+0092&gt;s day\r\nAnd growing to a gale through the tops of the forest,\r\nTill the ocean bears it on with tenderous voice,\r\nAnd nothing is heard but this.1 These stirring words of our great poet apply to your call to action, Madame Baroness. It began as a murmur through the lovely meadow of the Danube Valley2 , that old highway for the devastating armies of war. We already hear it in the forests in all parts of the world and soon, we hope, its voice, borne by the oceans of people, will permanently drown the sound of war drums and trumpets. This will take a long time, some will say. We do not know. And it makes no difference to our work. Our task is clear: to combat any act of violence, any war of aggression, and so render even the justifiable defensive war unnecessary. We shall rouse the conscience of man, put justice and morality in the place of war. We thank you, Madame Baroness, for your firm faith, for your hope and self-sacrifice, for your work. We too, in the lands of the North, women as well as men, need you to light and nourish the flame of faith and work. Good luck to you! Frédèric Passy, that venerable apostle of peace3 has called you, Madame Baroness, our general-in-chief. The friends of peace in Scandinavia applaud this salute.&quot;</code></pre>
+<!-- Well, that should have worked, but didn't. In fact, when we search for that escaped unicode character, regex is actually searching for the character itself, not the code. So we have to double escape it. Which is R means 3 backslashes. One final change that is usually made is to make all letters lowercase so as to make word searches easier. -->
+<pre class="r"><code>speech %&gt;%
+  str_replace_all(&quot;\u0092&quot;, &quot;&#39;&quot;) %&gt;%
+  str_replace_all(&quot;(\u0093)|(\u0094)&quot;, &#39;&quot;&#39;) %&gt;%
+  str_squish() %&gt;%
+  str_to_lower() %&gt;% # make all letters lower case
+  writeLines()</code></pre>
+<pre><code>## on behalf of the nobel committee, bjørnstjerne bjørnson introduced the speaker, baroness bertha von suttner, to the audience. in a few words he recalled the great influence of the baroness on the growth of the peace movement. while still young she had had the audacity to oppose the horrors of war1, and had done so in one of the most militaristic countries in europe. she had continued this fight all her life and never wearied of crying &quot;down with arms&quot;2. despite the laughter with which her words had been greeted in the beginning, they did receive a hearing because they were uttered by a person of noble character and because they proclaimed humanity&#39;s greatest cause. many women had since followed in her footsteps and taken up the cause, and the call to lay down arms had become general. moreover, to all men of goodwill the cause of peace and the women&#39;s cause were one and the same movement, striving for the same goal. when the cause of peace prevailed, then too would the women&#39;s cause be won. * * * history constantly demonstrates the great influence of women. women have encouraged the ideas of war, the attitude to life, and the causes for which men have fought, for which their sons were brought up, and of which they have dreamed. any change or reformation of these ideas must be brought about chiefly by women. the human ideal of manly courage and manly deeds must become more enlightened; the faithful worker in all spiritual and material spheres of life must displace the bloodstained hero as the true ideal. women will cooperate to give men higher aims, to give their sons nobler dreams. many are the individual women who have set an example in sacrifice and work, who have followed the armies as angels of consolation and healing, tending the sick and suffering. how much more effective it is to do one&#39;s utmost to prevent misfortune! this is where you, madame baroness, have taken the lead among women of today. you have attacked war itself and cried to the nations: &quot;down with arms!&quot; this call will be your eternal honor. beginning as a murmur in the corn on a summer&#39;s day and growing to a gale through the tops of the forest, till the ocean bears it on with tenderous voice, and nothing is heard but this.1 these stirring words of our great poet apply to your call to action, madame baroness. it began as a murmur through the lovely meadow of the danube valley2 , that old highway for the devastating armies of war. we already hear it in the forests in all parts of the world and soon, we hope, its voice, borne by the oceans of people, will permanently drown the sound of war drums and trumpets. this will take a long time, some will say. we do not know. and it makes no difference to our work. our task is clear: to combat any act of violence, any war of aggression, and so render even the justifiable defensive war unnecessary. we shall rouse the conscience of man, put justice and morality in the place of war. we thank you, madame baroness, for your firm faith, for your hope and self-sacrifice, for your work. we too, in the lands of the north, women as well as men, need you to light and nourish the flame of faith and work. good luck to you! frédèric passy, that venerable apostle of peace3 has called you, madame baroness, our general-in-chief. the friends of peace in scandinavia applaud this salute.</code></pre>
+<p>That looks pretty clean just as text. For most of our text analysis we’re actually going to remove all punctuation, but there is an argument to be made for getting as clean an original text as you can to start out with. Now that we know how to use <code>stringr</code> and regular expressions, we can easily strip out all punctuation. (some of the packages we will be using will also do this automatically for us as well)</p>
+<p>Let’s do that to the whole nobel corpus. We can either write a loop (seen as less good) or use the tidyverse (better).</p>
+<pre class="r"><code># for (i in 1:dim(nobel)[1]){
+#   nobel[&#39;AwardSpeech&#39;][i,] &lt;- nobel[&#39;AwardSpeech&#39;][i,] %&gt;%
+#     str_replace_all(&quot;\u0092&quot;, &quot;&#39;&quot;) %&gt;%
+#     str_replace_all(&quot;(\u0093)|(\u0094)&quot;, &#39;&quot;&#39;) %&gt;%
+#     str_squish()
+#}
+
+#OR
+
+(nobel &lt;- nobel %&gt;%
+  mutate(clean_text = str_replace_all(AwardSpeech, &quot;\u0092&quot;, &quot;&#39;&quot;)) %&gt;%
+  mutate(clean_text = str_replace_all(clean_text, &quot;(\u0093)|(\u0094)&quot;, &#39;&quot;&#39;)) %&gt;%
+  mutate(clean_text = str_to_lower(clean_text)) %&gt;%
+  mutate(clean_text = str_squish(clean_text)))</code></pre>
+<pre><code>## # A tibble: 92 x 4
+##     Year Laureate            AwardSpeech                clean_text              
+##    &lt;dbl&gt; &lt;chr&gt;               &lt;chr&gt;                      &lt;chr&gt;                   
+##  1  1905 Bertha von Suttner  &quot;  On behalf of the Nobel~ &quot;on behalf of the nobel~
+##  2  1906 Theodore Roosevelt  &quot;As the Nobel   Committee~ &quot;as the nobel committee~
+##  3  1907 Ernesto Teodoro Mo~ &quot;Ernesto Teodoro Moneta w~ &quot;ernesto teodoro moneta~
+##  4  1908 Klas Pontus Arnold~ &quot;On behalf of the Nobel C~ &quot;on behalf of the nobel~
+##  5  1909 Auguste Beernaert,~ &quot;Auguste Beernaert was bo~ &quot;auguste beernaert was ~
+##  6  1910 Permanent Internat~ &quot;Chairman of the Committe~ &quot;chairman of the commit~
+##  7  1911 Tobias Asser, Alfr~ &quot;Tobias Michael Carel Ass~ &quot;tobias michael carel a~
+##  8  1912 Elihu Root          &quot;Elihu Root was born on F~ &quot;elihu root was born on~
+##  9  1913 Henri La Fontaine   &quot;Henri La Fontaine is the~ &quot;henri la fontaine is t~
+## 10  1922 Fridtjof Nansen     &quot;I take pleasure in annou~ &quot;i take pleasure in ann~
+## # ... with 82 more rows</code></pre>
+<p>We can compare AwardSpeech with text columns, <code>nobel$clean_text</code> does indeed look cleaner.</p>
+<pre class="r"><code>nobel &lt;- nobel %&gt;%
+  select(Year, Laureate, clean_text) %&gt;%
+  rename(Year = Year, Laureate = Laureate, AwardSpeech = clean_text)  # renaming cols
+write_rds(nobel, &quot;data/nobel_cleaned.Rds&quot;)</code></pre>
+<p>More information on regular expressions: - <a href="https://www.princeton.edu/~mlovett/reference/Regular-Expressions.pdf" class="uri">https://www.princeton.edu/~mlovett/reference/Regular-Expressions.pdf</a> - <span class="citation">Wickham and Grolemund (2016)</span>, chapter 14. -</p>
+</div>
+<div id="excercises" class="section level2" number="2.2">
+<h2 number="2.2"><span class="header-section-number">2.2</span> Excercises</h2>
+<ul>
+<li>Look at other excess text in the Nobel corpus. How can we write code to cut these peices out?</li>
+<li>Are the problems the same with the SR report corpus? Take a look and see if we can run the same code or we need to do different things to clean that corpus.</li>
+</ul>
+</div>
+</div>
+<div id="manipulating-dataframes" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Manipulating dataframes</h1>
+<p>At this point there is actually a fair amount we can do with our corpus as a dataframe and text corpus in one column. To help us manipulate dataframes, let’s take a quick look at the tidyverse’s system of manipulation by common-sense verbs.</p>
+<p>With <code>nobel</code> we have a dataframe of speeches from 1905 to 2019 (with some holes where there was no prize given out). How do we subset this dataframe so we have only speeches from 1950-1980? Use filter.</p>
+<pre class="r"><code>nobel %&gt;%
+  filter(Year &gt;= 1950 &amp; Year &lt;= 1980)</code></pre>
+<pre><code>## # A tibble: 26 x 3
+##     Year Laureate                                                    AwardSpeech
+##    &lt;dbl&gt; &lt;chr&gt;                                                       &lt;chr&gt;      
+##  1  1950 Ralph Bunche                                                &quot;dr. ralph~
+##  2  1951 Léon Jouhaux                                                &quot;alfred no~
+##  3  1952 Albert Schweitzer                                           &quot;albert sc~
+##  4  1953 George C. Marshall                                          &quot;when cade~
+##  5  1954 Office of the United Nations High Commissioner for Refugees &quot;the nobel~
+##  6  1957 Lester Bowles Pearson                                       &quot;the nobel~
+##  7  1958 Georges Pire                                                &quot;the nobel~
+##  8  1959 Philip Noel-Baker                                           &quot;frequentl~
+##  9  1960 Albert Lutuli                                               &quot;this year~
+## 10  1961 Dag Hammarskjöld                                            &quot;the nobel~
+## # ... with 16 more rows</code></pre>
+<p>Here we’ve said to filter the corpus based on rows where Year is greater or equal to 1950 and less than or equal to 1980. &amp; is the “and” operator, | is “or,” and ! is not.</p>
+<pre class="r"><code>nobel %&gt;%
+  filter(Year == 1950 | Year == 1980) # returns rows for 1950 and 1980
+nobel %&gt;%
+  filter(Year &gt;= 1950 &amp; Year &lt;= 1954 &amp; Year != 1953) # returns rows &gt;= 1950, &lt;=1954 and not 1953</code></pre>
+<p><code>mutate</code> adds new columns. Say we’d like a column telling us whether the year was before WWII or after.</p>
+<pre class="r"><code>nobel %&gt;%
+  mutate(after_WWII = Year &gt; 1945)</code></pre>
+<pre><code>## # A tibble: 92 x 4
+##     Year Laureate                  AwardSpeech                        after_WWII
+##    &lt;dbl&gt; &lt;chr&gt;                     &lt;chr&gt;                              &lt;lgl&gt;     
+##  1  1905 Bertha von Suttner        &quot;on behalf of the nobel committee~ FALSE     
+##  2  1906 Theodore Roosevelt        &quot;as the nobel committee meets tod~ FALSE     
+##  3  1907 Ernesto Teodoro Moneta, ~ &quot;ernesto teodoro moneta was born ~ FALSE     
+##  4  1908 Klas Pontus Arnoldson, F~ &quot;on behalf of the nobel committee~ FALSE     
+##  5  1909 Auguste Beernaert, Paul ~ &quot;auguste beernaert was born in 18~ FALSE     
+##  6  1910 Permanent International ~ &quot;chairman of the committee løvlan~ FALSE     
+##  7  1911 Tobias Asser, Alfred Fri~ &quot;tobias michael carel asser was b~ FALSE     
+##  8  1912 Elihu Root                &quot;elihu root was born on february ~ FALSE     
+##  9  1913 Henri La Fontaine         &quot;henri la fontaine is the true le~ FALSE     
+## 10  1922 Fridtjof Nansen           &quot;i take pleasure in announcing th~ FALSE     
+## # ... with 82 more rows</code></pre>
+<p>One thing I often do is use <code>mutate</code> to do word counts of every document row, essentially by counting all clusters of words or numbers that are separated by spaces on either side.</p>
+<pre class="r"><code>nobel &lt;- nobel %&gt;%
+  mutate(wc = str_count(AwardSpeech, &#39;[\\w]+&#39;))</code></pre>
+<p>And now we can finally start doing some analysis! Right now you will note that if we want to plot the length of award speeches over time, we have a Year column that could be an x-axis variable and a word count column as y-axis. This sounds tidy to me.</p>
+<pre class="r"><code>nobel %&gt;%
+  ggplot(aes(x = Year, y = wc)) +
+  geom_line() # just line graph, we might add geom_point() to underscore that we have missing years</code></pre>
+<p><img src="3_CleaningAndManipulating_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>Tidy offers us the handy <code>summarize</code> command to summarize. First, can we sum all the word counts to get a total word count for our entire Nobel corpus? And average word count?</p>
+<pre class="r"><code>nobel %&gt;%
+  summarize(average = sum(wc))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   average
+##     &lt;int&gt;
+## 1  236021</code></pre>
+<pre class="r"><code>nobel %&gt;%
+  summarize(average = mean(wc))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   average
+##     &lt;dbl&gt;
+## 1   2565.</code></pre>
+<p>Where summarize really shines though is if we have groups. Let’s split our corpus up by decade and then we’ll get average word counts by decade using the <code>group_by</code> function.</p>
+<pre class="r"><code>nobel %&gt;%
+  mutate(decade = (Year %/% 10) * 10) %&gt;% # uses something called modulo division to get the decade
+  group_by(decade) %&gt;%
+  summarize(mean(wc))</code></pre>
+<pre><code>## # A tibble: 12 x 2
+##    decade `mean(wc)`
+##     &lt;dbl&gt;      &lt;dbl&gt;
+##  1   1900       713 
+##  2   1910       686.
+##  3   1920      3257.
+##  4   1930      2428.
+##  5   1940      3417.
+##  6   1950      3577.
+##  7   1960      3288.
+##  8   1970      3087 
+##  9   1980      2948.
+## 10   1990      1874.
+## 11   2000      2517.
+## 12   2010      2084.</code></pre>
+<p><code>summarize</code> also has a <code>n()</code> function that can be helpful telling us how many observations per group we have. There were alot of years without a Nobel Peace Prize so this might be interesting to look at.</p>
+<pre class="r"><code>nobel %&gt;%
+  mutate(decade = (Year %/% 10) * 10) %&gt;% 
+  group_by(decade) %&gt;%
+  summarize(n())</code></pre>
+<pre><code>## # A tibble: 12 x 2
+##    decade `n()`
+##     &lt;dbl&gt; &lt;int&gt;
+##  1   1900     5
+##  2   1910     4
+##  3   1920     5
+##  4   1930     8
+##  5   1940     5
+##  6   1950     8
+##  7   1960     8
+##  8   1970     9
+##  9   1980    10
+## 10   1990    10
+## 11   2000    10
+## 12   2010    10</code></pre>
+<p>This also gives us all the tools we need to do google-style n-gram plots (there are many ways to do this of course). We count the number of words in the texts, group by year, and then plot.</p>
+<pre class="r"><code>nobel %&gt;%
+  mutate(peace = str_count(AwardSpeech, &quot;[Pp]eace&quot;)) %&gt;%
+  mutate(war = str_count(AwardSpeech, &quot;[Ww]ar&quot;)) %&gt;%
+  mutate(humright = str_count(AwardSpeech, &quot;[Hh]uman [Rr]ights&quot;)) %&gt;%
+  group_by(Year) %&gt;%
+  summarize(peace = sum(peace), war = sum(war), human_rights = sum(humright)) %&gt;%
+  pivot_longer(c(&quot;peace&quot;, &quot;war&quot;, &quot;human_rights&quot;), names_to = &quot;word&quot;, values_to = &quot;counts&quot;) %&gt;%
+  ggplot(aes(x = Year, y = counts, color = word)) +
+    geom_line()</code></pre>
+<p><img src="3_CleaningAndManipulating_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<div id="excercises-1" class="section level2" number="3.1">
+<h2 number="3.1"><span class="header-section-number">3.1</span> Excercises</h2>
+<ul>
+<li>Make other n-grams of your choice of the Nobel corpus. Anything surprising?</li>
+<li>Using the SR corpus, find total word count of the corpus, graph word counts by company over time, and plot out n-grams of words of your choice.</li>
+<li>Chart n-grams over time per company with the SR corpus.</li>
+</ul>
+</div>
+</div>
+<div id="appendix" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Appendix</h1>
+<p>If we google “nobel prize ceremony speech,” we land on a page that looks like <a href="https://www.nobelprize.org/prizes/peace/2018/ceremony-speech/">this</a>. We note that we can navigate to ceremony speeches of other years but this takes a lot of clicking. It’s going to take a lot of work to program a bot to do this. BUT! If we look at the url we see that it’s standardized with a year. What if we try the same thing with 2017? It gives us exactly the page we want. In fact, it does so for any year since the very earliest years of the prize. (Incidentally, navigating by links on the cite I have trouble accessing them before the 1960s.) This makes it very easy to generate a list of links.</p>
+<pre class="r"><code># https://www.nobelprize.org/prizes/peace/1905/ceremony-speech/   This is the link that we need to replicate changing the year for each year between 1905 and 2019. We&#39;ll start in 1905 as before that it&#39;s not really the speech but something less, we want to compare apples to apples as much as possible
+library(rvest)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;rvest&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:readr&#39;:
+## 
+##     guess_encoding</code></pre>
+<pre class="r"><code>## https://www.nobelprize.org/prizes/peace/1905/ceremony-speech/
+urls &lt;- vector()
+for (i in 1905:2019){
+  new_url &lt;- paste0(&quot;https://www.nobelprize.org/prizes/peace/&quot;, i, &quot;/ceremony-speech/&quot;)
+  urls &lt;- append(urls, new_url)
+  }</code></pre>
+<p>But not all these links exist because the Nobel wasn’t given out in all years. If we try to open those years (try, for instance, <a href="https://www.nobelprize.org/prizes/peace/1915/ceremony-speech/" class="uri">https://www.nobelprize.org/prizes/peace/1915/ceremony-speech/</a>) There are several ways we could deal with this, we could write down years it wasn’t given out and remove them from our list of possible urls. But the other thing we can do is use a “try block” within our loop that tells R precisely that: try this, but if it doesn’t work, just got on to the next object in the loop. We’re going to do this, and then scrape the page in a similar way to which we scraped nrk.no in the last unit. We’re going to be a bit more particular about what we edit out because we want only the the text of the speeches as much as possible, not the additional information (citation info, informational footers, etc) that the site gives us.</p>
+<pre class="r"><code>corp &lt;- tibble()
+for (url_address in urls){
+  try(
+  {
+    nobel &lt;- read_html(url_address)
+    text &lt;- nobel %&gt;%
+      html_elements(&#39;article.page-content.border-top.entry-content&#39;) %&gt;%
+      html_elements(&#39;p&#39;) %&gt;%
+      html_text() %&gt;%
+      tibble()
+    footer &lt;- nobel %&gt;%
+      html_elements(&quot;footer&quot;) %&gt;%
+      html_elements(&#39;p&#39;) %&gt;%
+      html_text() %&gt;%
+      tibble()
+    small_text &lt;- nobel %&gt;%
+      html_elements(&quot;p.smalltext&quot;) %&gt;%
+      html_text() %&gt;%
+      tibble() %&gt;%
+      drop_na()
+    copy_text &lt;- nobel %&gt;%
+      html_elements(&quot;p.copy&quot;) %&gt;%
+      html_text() %&gt;%
+      tibble() %&gt;%
+      drop_na()
+    remove_text &lt;- rbind(footer, small_text, copy_text)
+    remove &lt;- vector()
+    for (i in 1:dim(remove_text)[1]){
+      for (j in 1:dim(text)[1]){
+        if (text[j,] == remove_text[i,]){
+        remove &lt;- c(remove, j)
+      }
+    }
+    }
+    text &lt;- text[-remove, ]
+    total_text &lt;- &#39;&#39;
+      for (i in 1:dim(text)[1]) {
+        total_text &lt;- paste(total_text, str_c(text[i,1]))
+        }
+    laureate &lt;- nobel %&gt;%
+      html_elements(&#39;li.list-laureate&#39;) %&gt;%
+      html_text() %&gt;%
+      str_trim() # trims white space before and after
+    laureate &lt;- str_c(laureate, collapse = &quot;, &quot;) # also from stringer, concatenates multiple character objects into one
+    year &lt;- str_extract(url_address, &quot;[0-9]{4}&quot;)
+    temp_tibble &lt;- tibble(Year = year, Laureate = laureate, AwardSpeech = total_text)
+    temp_tibble
+    corp &lt;- rbind(corp, temp_tibble)
+}
+  )
+}
+
+write.csv(corp, &quot;NobelPeace.csv&quot;)</code></pre>
+<p>The second corpus is made up of 45 Sustainability Reports of major international oil companies for as long as available publically on the internet (these were hand-scraped – sometimes simplest really is the best). This is an example of what the pdfs look like:</p>
+<div class="figure" style="text-align: center">
+<img src="data/bp_sr.jpg" alt="Sample page from BP's 2019 sustainability report."  />
+<p class="caption">
+Sample page from BP’s 2019 sustainability report.
+</p>
+</div>
+<p>Lot’s of tables, columns sometimes but sometimes not – this is definitely a job for <code>tabulizer</code>. With all the pdfs in one folder called “SRs” in the project root directory and with file names all standardized in the format SR-[year]-[companyname].pdf, we can extract metadata, read in the text and save it all as a tibble in just a few lines of code. Tabulizer really makes our lives a whole lot easier here.</p>
+<pre class="r"><code>library(stringr)
+library(tabulizer)
+
+files &lt;- list.files(&quot;./SRs&quot;)
+files &lt;- files[str_detect(files, &quot;SR-.*&quot;)]
+srps &lt;- tibble()
+for (pdf in files) {
+  pdf &lt;- paste0(&quot;./SRs/&quot;, pdf)
+  numpages &lt;- get_n_pages(pdf)
+  text &lt;- extract_text(pdf, encoding = &#39;UTF-8&#39;, pages=1:numpages)
+  df_new &lt;- tibble(Text = text)
+  df_new[&#39;Year&#39;] &lt;- str_match(pdf, &#39;[0-9]{4}&#39;)
+  df_new[&#39;Company&#39;] &lt;- str_match(pdf, &quot;(?&lt;=-)[a-z]*(?=\\.pdf)&quot;)
+  srps &lt;- rbind(srps, df_new)  
+}
+
+# Checking to see that we have everything, indeed we see 45 publications and the number of pages for each, which looks right
+srps %&gt;%
+  group_by(Company, Year) %&gt;%
+  summarize(n()) %&gt;%
+  print(n = Inf)</code></pre>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-wickham2016r" class="csl-entry">
+Wickham, Hadley, and Garrett Grolemund. 2016. <em><span>R</span> for Data Science: Import, Tidy, Transform, Visualize, and Model Data</em>. " O’Reilly Media, Inc.". <a href="https://r4ds.had.co.nz/index.html">https://r4ds.had.co.nz/index.html</a>.
+</div>
+</div>
+</div>
+
+<br><br><p>2021. <a href="mailto: gregory.fergusoncradler@inn.no">gregory.fergusoncradler@inn.no</a></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Session 5: POS and dictionary methods</title>
+
+<script src="site_libs/header-attrs-2.9/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/clipboard-1.7.1/clipboard.min.js"></script>
+<link href="site_libs/primer-tooltips-1.4.0/build.css" rel="stylesheet" />
+<link href="site_libs/klippy-0.0.0.9500/css/klippy.min.css" rel="stylesheet" />
+<script src="site_libs/klippy-0.0.0.9500/js/klippy.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Overview
+  </a>
+</li>
+<li>
+  <a href="schedule.html">
+    <span class="fa fa-info"></span>
+     
+    Schedule
+  </a>
+</li>
+<li>
+  <a href="1_RBasics.html">
+    <span class="fa fa-book"></span>
+     
+    Session 1
+  </a>
+</li>
+<li>
+  <a href="2_ScrapingAndReadingInDocuments.html">
+    <span class="fa fa-book"></span>
+     
+    Session 2
+  </a>
+</li>
+<li>
+  <a href="3_CleaningAndManipulating.html">
+    <span class="fa fa-book"></span>
+     
+    Session 3
+  </a>
+</li>
+<li>
+  <a href="4_WordFreq.html">
+    <span class="fa fa-book"></span>
+     
+    Session 4
+  </a>
+</li>
+<li>
+  <a href="5_SentAndDict.html">
+    <span class="fa fa-book"></span>
+     
+    Session 5
+  </a>
+</li>
+<li>
+  <a href="6_DocSimil.html">
+    <span class="fa fa-book"></span>
+     
+    Session 6
+  </a>
+</li>
+<li>
+  <a href="7_topicmodelling.html">
+    <span class="fa fa-book"></span>
+     
+    Session 7
+  </a>
+</li>
+<li>
+  <a href="8_WordEmbedding.html">
+    <span class="fa fa-book"></span>
+     
+    Session 8
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Session 5: POS and dictionary methods</h1>
+
+</div>
+
+
+<script>
+  addClassKlippyTo("pre.r, pre.markdown");
+  addKlippy('right', 'top', 'auto', '1', 'Copy code', 'Copied!');
+</script>
+<div id="pos" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> POS</h1>
+<p>We have now calculated lists of words appearing with top frequency and also seen how to calculate and graph words or phrases of interest across documents. But what if we were interested in seeing highest frequency words within a larger set of words? If were were interested in a limited set of, say, geographical names or people we could just make the list, do a join to remove all other words and calculate top frequencies among this subset of words. But what if we were interested in, say, highest occurring verbs?</p>
+<p>For this and many other reasons linguists have long been interested in writing algorithms to automatically identify parts of speech, called part-of-speech tagging or POS. A POS tagger would take a sentence such as “The brown fox jumped over the brown log” and return “The_(article) brown_(adjective) fox_(noun) over_(preposition)” and so on.</p>
+<p>One way we could imagine going about this is with a dictionary that identified nouns, verbs, etc. but this is clearly naive – many a word can be both noun and verb and much will depend on context. So we’ll use the openNLP package and write this function<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<pre class="r"><code>library(NLP)
+library(tm)  # load before openNLP
+library(openNLP)
+library(openNLPmodels.en)
+
+POStagger &lt;- function(text, filter = NULL){
+  # defining annotators 
+  sent_token_annotator &lt;- Maxent_Sent_Token_Annotator()
+  word_token_annotator &lt;- Maxent_Word_Token_Annotator()
+  pos_tag_annotator &lt;- Maxent_POS_Tag_Annotator()
+  # make sure input is a string
+  text &lt;- as.String(text)
+  # defining a pipeline
+  annotate_text &lt;- NLP::annotate(text, Annotator_Pipeline(
+    sent_token_annotator,
+    word_token_annotator,
+    pos_tag_annotator
+  ))
+  # generate tags
+  tags &lt;- sapply(subset(annotate_text, type==&quot;word&quot;)$features, `[[`, &quot;POS&quot;)
+  # get tokens
+  tokens &lt;- text[subset(annotate_text, type==&quot;word&quot;)]
+  # filter out just one pos type
+  if (!is.null(filter)) {
+    tagged &lt;- tokens[tags %in% filter]
+  } else {
+  # put tokens and pos tags in df
+  tagged &lt;- tibble(word=tokens, pos=tags) %&gt;% 
+      filter(!str_detect(pos, pattern=&#39;[[:punct:]]&#39;))}
+  return(tagged)
+}
+
+nobel &lt;- read_rds(&quot;data/nobel_cleaned.Rds&quot;)
+POStagger(nobel$text[1])</code></pre>
+<p>This yields a nice dataframe with tokens in the first column and POS in the second column. The POS are not just “noun,” “verb” and so on but more finely differentiated. See <a href="https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html">here</a> for a list of abbreviations. Using the same filter, group_by, etc methods we can now find lists of most frequently words by type of speech. There are, of course, other applications we might imagine when POS-tagging is used in conjunction with other topics discussed in the workshop.</p>
+<p>You don’t really need to worry about what’s in there but that it takes a character string (preferably cleaned, as always, to limit the chance of unexpected errors). Note, too, that the function has the option of specifying a filter that will return a string of words of a certain POS.</p>
+</div>
+<div id="sentiment-analysis" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Sentiment analysis</h1>
+<p>Another commonly done sort of analysis that we can easily incorporate into our tidy workflow is that of sentiment analysis. There are numerous ways computational linguists have developed to algorithmically determine the “sentiment” of a piece of text. We focus here on a simple (and fairly naive) method that works on the level of individual words and employs a sentiment dictionary, essentially a list of words and their associated sentiments. As we will see, these same dictionary methods can also be applied to any list or lists of words and thus give analysts a more flexible tool to track vocabulary across a corpus.</p>
+<p><code>tidytext</code> includes three dictionaries, each working slightly differently.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> Let’s take a look below.</p>
+<pre class="r"><code>library(tidytext)
+# the first time you will need to say yes to download of the sentiment dictionary
+get_sentiments(&quot;afinn&quot;)</code></pre>
+<pre><code>## # A tibble: 2,477 x 2
+##    word       value
+##    &lt;chr&gt;      &lt;dbl&gt;
+##  1 abandon       -2
+##  2 abandoned     -2
+##  3 abandons      -2
+##  4 abducted      -2
+##  5 abduction     -2
+##  6 abductions    -2
+##  7 abhor         -3
+##  8 abhorred      -3
+##  9 abhorrent     -3
+## 10 abhors        -3
+## # ... with 2,467 more rows</code></pre>
+<pre class="r"><code>tail(get_sentiments(&quot;afinn&quot;))</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   word     value
+##   &lt;chr&gt;    &lt;dbl&gt;
+## 1 youthful     2
+## 2 yucky       -2
+## 3 yummy        3
+## 4 zealot      -2
+## 5 zealots     -2
+## 6 zealous      2</code></pre>
+<p>Here we have negative or positive sentiment (words beginning with “ab-” seem to be quite negative!). If we want to get a quick overview of the scale we can call either <code>table()</code> or <code>summary()</code></p>
+<pre class="r"><code>table(get_sentiments(&quot;afinn&quot;)$value) # for categorical data, tells us categories and n of those categories</code></pre>
+<pre><code>## 
+##  -5  -4  -3  -2  -1   0   1   2   3   4   5 
+##  16  43 264 966 309   1 208 448 172  45   5</code></pre>
+<pre class="r"><code>summary(get_sentiments(&quot;afinn&quot;)$value) # summary statistics for the value column </code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## -5.0000 -2.0000 -2.0000 -0.5894  2.0000  5.0000</code></pre>
+<p>So we see the value of sentiments goes from -5 to 5. Calling the other two:</p>
+<pre class="r"><code>get_sentiments(&quot;bing&quot;)</code></pre>
+<pre><code>## # A tibble: 6,786 x 2
+##    word        sentiment
+##    &lt;chr&gt;       &lt;chr&gt;    
+##  1 2-faces     negative 
+##  2 abnormal    negative 
+##  3 abolish     negative 
+##  4 abominable  negative 
+##  5 abominably  negative 
+##  6 abominate   negative 
+##  7 abomination negative 
+##  8 abort       negative 
+##  9 aborted     negative 
+## 10 aborts      negative 
+## # ... with 6,776 more rows</code></pre>
+<pre class="r"><code>get_sentiments(&quot;nrc&quot;)</code></pre>
+<pre><code>## # A tibble: 13,875 x 2
+##    word        sentiment
+##    &lt;chr&gt;       &lt;chr&gt;    
+##  1 abacus      trust    
+##  2 abandon     fear     
+##  3 abandon     negative 
+##  4 abandon     sadness  
+##  5 abandoned   anger    
+##  6 abandoned   fear     
+##  7 abandoned   negative 
+##  8 abandoned   sadness  
+##  9 abandonment anger    
+## 10 abandonment fear     
+## # ... with 13,865 more rows</code></pre>
+<p>“Bing” labels words simply negative or positive and the “nrc” lexicon labels them according to a handful of main emotions. You can take a look at the tidytext documentation for more background on the lexicons.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+<p>So what do we do with these? The simplest method is simply to count words from the lexicons that appear in a text and add them all up. This is what is known as a dictionary method, which we’ll talk about in a little more depth below. From a practical standpoint, how do we add up all dictionary words in a text? Tidy makes this pretty easy. You’ll see the code is a little bit different based on the kind of dictionary.</p>
+<p>For the <code>bing</code> dictionary we will tokenize our corpus, do an inner join<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a> with the sentiments dictionary which will create a new row in our Nobel corpus dataframe where every row is the associated sentiment with the corpus word and corpus words that do not have a sentiment associated with them in the <code>bing</code> dictionary will be eliminated from the dataframe. We then do a <code>pivot_wider</code>, the opposite of <code>pivot_longer</code> which we did in the previous session when graphing n-grams. <code>pivot_wider</code> will make several columns out of fewer – here taking the values of the <code>sentiment</code> column (“positive” and “negative”) and making them column titles and populating the column values with those from the associated rows of our <code>n</code> column. Take a look at what the dataframe looks like before and after transformation to make sure you understand what is happening. We do this pivot in order to then be able to do basic arithmetic – take the number of “positive” word frequencies and subtract the number of negative word frequencies, and do this for every document in the corpus. This will be our sentiment “score.” It is then a fairly straightforward path to graphing it on ggplot.</p>
+<pre class="r"><code>library(tidyverse)
+nobel &lt;- read_rds(&quot;data/nobel_cleaned.Rds&quot;)
+# calculating text sentiment by subtracting total positive sentiment words from total negative with bing lexicon
+nobel %&gt;%
+  unnest_tokens(word, AwardSpeech) %&gt;%  ## we call our new column &quot;word&quot; which makes inner_joins easier 
+  inner_join(get_sentiments(&quot;bing&quot;)) %&gt;%
+  count(sentiment, year = Year) %&gt;% 
+  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) %&gt;% 
+  mutate(sentiment = positive - negative) %&gt;%
+  ggplot(aes(year, sentiment)) +
+           geom_line(show.legend = FALSE) +
+           geom_hline(yintercept = 0, linetype = 2, alpha = .8)</code></pre>
+<p><img src="5_SentAndDict_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>With the <code>afinn</code> corpus we have numeric “sentiment values” attached to words so we need to sum all the values of all words in each document.</p>
+<pre class="r"><code># using the afinn lexicon
+nobel %&gt;%
+  unnest_tokens(word, AwardSpeech) %&gt;%  ## we call our new column &quot;word&quot; which makes inner_joins easier 
+  inner_join(get_sentiments(&quot;afinn&quot;)) %&gt;%
+  group_by(Year) %&gt;%
+  summarize(sentiment = sum(value)) %&gt;%
+    ggplot(aes(Year, sentiment)) +
+    geom_line(show.legend = FALSE) +
+    geom_hline(yintercept = 0, linetype = 2, alpha = .8)</code></pre>
+<p><img src="5_SentAndDict_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>We can also do this over different categories over years. For instance, say we’d like to do this same kind of chart but for each of our oil company’s sustainability reports.</p>
+<pre class="r"><code>sr &lt;- srps &lt;- read_csv(&quot;data/srps.csv&quot;)</code></pre>
+<pre><code>## 
+## -- Column specification --------------------------------------------------------
+## cols(
+##   Text = col_character(),
+##   Year = col_double(),
+##   Company = col_character()
+## )</code></pre>
+<pre class="r"><code>sr %&gt;%
+  unnest_tokens(word, Text) %&gt;%  ## we call our new column &quot;word&quot; which makes inner_joins easier 
+  inner_join(get_sentiments(&quot;afinn&quot;)) %&gt;%
+  group_by(Company, Year) %&gt;%
+  summarize(sentiment = sum(value)) %&gt;%
+  ggplot(aes(Year, sentiment)) +
+    geom_line(show.legend = FALSE) +
+    geom_hline(yintercept = 0, linetype = 2, alpha = .8) +
+    facet_wrap(~Company, ncol = 2, scales = &quot;free_x&quot;)</code></pre>
+<pre><code>## Joining, by = &quot;word&quot;</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Company&#39;. You can override using the `.groups` argument.</code></pre>
+<p><img src="5_SentAndDict_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>We can also use the sentiment lexicons in ways that mostly combine what we have already done in subsetting dataframes and counting words. Say we’d like to see which words in a certain category of documents are associated with negative anticipation in the pre-WWII vs post-WWII Nobel prize award speeches. We’ll do this in several steps.</p>
+<p>First we get a dictionary of the words associated with anticipation. Then do the same with negative sentiment words. Then we again do an <code>inner_join()</code> that creates a new dataframe that includes only those words present in both <code>anticipation</code> and <code>negative</code>.</p>
+<pre class="r"><code>anticipation &lt;- get_sentiments(&quot;nrc&quot;) %&gt;% 
+  filter(sentiment == &quot;anticipation&quot;)
+negative &lt;- get_sentiments(&quot;nrc&quot;) %&gt;%
+  filter(sentiment == &quot;negative&quot;)
+negAnt &lt;- inner_join(anticipation, negative, by=&quot;word&quot;) %&gt;%
+  select(word)        # we don&#39;t really need the other two columns which tell us that they are negative and anticipation words</code></pre>
+<p>Now we make our Nobel data “tidy” (one-token-per-row) and do another <code>inner_join()</code> with our negative anticipation words. What we have left are all negative anticipation words in the corpus, which we can then print.</p>
+<pre class="r"><code>nobel %&gt;%
+  mutate(Period = ifelse(Year &gt;= 1945, &quot;Pre-WWII&quot;, &quot;Post-WWII&quot;)) %&gt;%
+  mutate(Period = factor(Period, levels = c(&quot;Pre-WWII&quot;, &quot;Post-WWII&quot;))) %&gt;% # CHanges
+  unnest_tokens(word, AwardSpeech) %&gt;%
+  inner_join(negAnt) %&gt;%
+  group_by(Period) %&gt;%
+  count(word, sort = TRUE) %&gt;%
+  slice_max(order_by=n, n = 15) %&gt;%                     # selecting to show only top 15 words within each group
+  ggplot(aes(reorder_within(x = word, by = n, within = Period), n, fill = Period)) +    # reordering is a bit tricky, see ?reorder_within()
+  geom_col(show.legend = FALSE) +
+  scale_x_reordered() +
+  coord_flip() +
+  facet_wrap(~Period, ncol = 2, scales = &quot;free&quot;) +
+  theme_bw() +
+  xlab(&#39;Words&#39;)</code></pre>
+<pre><code>## Joining, by = &quot;word&quot;</code></pre>
+<p><img src="5_SentAndDict_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Wait, “mother” is a word associated with both negativity and anticipation?</p>
+<pre class="r"><code>get_sentiments(&quot;nrc&quot;) %&gt;%
+  filter(word == &quot;mother&quot;)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   word   sentiment   
+##   &lt;chr&gt;  &lt;chr&gt;       
+## 1 mother anticipation
+## 2 mother joy         
+## 3 mother negative    
+## 4 mother positive    
+## 5 mother sadness     
+## 6 mother trust</code></pre>
+<p>Apparently so, according to this lexicon. Which offers us a nice segue into a larger discussion of dictionaries.</p>
+</div>
+<div id="dictionary-methods" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Dictionary methods</h1>
+<p>It is entirely obvious to historians that the meaning of words – not to mention latent sentiments – changes over time, place, and context within individual documents. So these methods have to be used with care. To take one instance, economists have noticed that words like “liability” have very different sentiment and latent connotations in finance and other areas of life (<span class="citation">Loughran and Mcdonald (2011)</span>). Thus it might behoove us to create our own dictionaries and this is something we could easily do. In this case, we (as domain experts) could compile our own dictionaries not only to judge sentiment, but to measure attention given to certain topics, tone of discussion,</p>
+<p>Here really the only challenge is to read a dictionary into R and then use it per the above methods. Say that we have a list of words in a text file, not comma-separated, that is a dictionary for identifying when the theme of oil is brought up in a text (this is something I came up with in literally 5 seconds, please do not use this for anything – actual dictionaries should be considerably better thought out, as well as verified on real texts that it’s catching what you want it to). Each word is on its own separate line (coincidentally this is the format of the above cited Norwegian sentiment dictionary, so should you want to use that you can adopt the process here.)</p>
+<pre class="r"><code>oil_dict &lt;- read_lines(&quot;data/oil_theme.txt&quot;)
+oil_dict &lt;- tibble(word = oil_dict, dictionary = &quot;oil dictionary&quot;)
+oil_dict %&gt;%
+  filter(word != &quot;&quot;)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   word      dictionary    
+##   &lt;chr&gt;     &lt;chr&gt;         
+## 1 oil       oil dictionary
+## 2 petrol    oil dictionary
+## 3 petroleum oil dictionary
+## 4 gas       oil dictionary
+## 5 tanker    oil dictionary
+## 6 fossil    oil dictionary</code></pre>
+<p>In all of two lines of code we’ve made it into a tibble. We can see also we have an empty string as the last line. We take care of that and then we’re all set to use this dictionary. Now if we want to add up everytime a text uses a word in this dictionary we can easily do this.</p>
+<div id="excercises" class="section level2" number="3.1">
+<h2 number="3.1"><span class="header-section-number">3.1</span> Excercises</h2>
+<ul>
+<li>Compile your own dictionary of interest and use it to locate a theme of interest in the Nobel corpus.</li>
+<li>Use our very informal oil dictionary and apply it to the Sustainability Reports. You might also scale by number of total words per corpus – are oil terms smaller proportion of sustainability reports than they were 10 years ago?</li>
+</ul>
+</div>
+</div>
+<div id="mulitple-word-analysis" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Mulitple word analysis</h1>
+<div id="n-grams" class="section level2" number="4.1">
+<h2 number="4.1"><span class="header-section-number">4.1</span> N-grams</h2>
+<p>In Google’s famous n-grams viewer, you can search not just for a single word but for phrases, sets of words “n” tokens long. Indeed, this is why it is called an “n”-gram, they are consecutive sequences of an arbitrary number of words. So far we’ve only been looking at individual words, so lets think about multi-word units.</p>
+<p>True to form, the tidyverse will help out with this, allowing us to <code>unnest_tokens()</code> by the n-gram by telling R that our token of interest is now not the single word but an ngram of n length.</p>
+<pre class="r"><code>nobel %&gt;%
+  unnest_tokens(twogram, AwardSpeech, token = &quot;ngrams&quot;, n = 2)</code></pre>
+<pre><code>## # A tibble: 234,267 x 3
+##     Year Laureate           twogram               
+##    &lt;dbl&gt; &lt;chr&gt;              &lt;chr&gt;                 
+##  1  1905 Bertha von Suttner on behalf             
+##  2  1905 Bertha von Suttner behalf of             
+##  3  1905 Bertha von Suttner of the                
+##  4  1905 Bertha von Suttner the nobel             
+##  5  1905 Bertha von Suttner nobel committee       
+##  6  1905 Bertha von Suttner committee bjørnstjerne
+##  7  1905 Bertha von Suttner bjørnstjerne bjørnson 
+##  8  1905 Bertha von Suttner bjørnson introduced   
+##  9  1905 Bertha von Suttner introduced the        
+## 10  1905 Bertha von Suttner the speaker           
+## # ... with 234,257 more rows</code></pre>
+<p>And we could then make a plot of the most frequently occurring 2-grams. The problem with this is that we’re going to be overrun with stopwords, but now that we have bigrams how to do take the individual stop words? We could search and remove with <code>str_remove_all</code> without unnesting words, we could unnest, take out the stop words, renest and then unnest by 2-grams, but we could also use a more tidy approach and <code>separate()</code> which is another handy command for manipulating tidyverse dataframes.</p>
+<pre class="r"><code>nobel %&gt;%
+  unnest_tokens(twogram, AwardSpeech, token = &quot;ngrams&quot;, n = 2) %&gt;%
+  separate(twogram, into=c(&quot;word1&quot;, &quot;word2&quot;), sep = &quot; &quot;)  # here the call states what col to separate, into which columns, and where the separation should be made, here when there is a space between the words</code></pre>
+<pre><code>## # A tibble: 234,267 x 4
+##     Year Laureate           word1        word2       
+##    &lt;dbl&gt; &lt;chr&gt;              &lt;chr&gt;        &lt;chr&gt;       
+##  1  1905 Bertha von Suttner on           behalf      
+##  2  1905 Bertha von Suttner behalf       of          
+##  3  1905 Bertha von Suttner of           the         
+##  4  1905 Bertha von Suttner the          nobel       
+##  5  1905 Bertha von Suttner nobel        committee   
+##  6  1905 Bertha von Suttner committee    bjørnstjerne
+##  7  1905 Bertha von Suttner bjørnstjerne bjørnson    
+##  8  1905 Bertha von Suttner bjørnson     introduced  
+##  9  1905 Bertha von Suttner introduced   the         
+## 10  1905 Bertha von Suttner the          speaker     
+## # ... with 234,257 more rows</code></pre>
+<p>Now we can do our stopword work. We could do an <code>anti_join</code> on word1 and then word2 but the other nifty thing we can do with tidy commands is use the <code>%in%</code> command (this being the syntax of commands used in SQL databases some of which the tidyverse lets you do).</p>
+<pre class="r"><code>nob &lt;- nobel %&gt;%
+  mutate(Period = ifelse(Year &lt;= 1945, &quot;Pre-WWII&quot;, &quot;Post-WWII&quot;)) %&gt;% 
+  unnest_tokens(twogram, AwardSpeech, token = &quot;ngrams&quot;, n = 2) %&gt;%
+  separate(twogram, into=c(&quot;word1&quot;, &quot;word2&quot;), sep = &quot; &quot;) %&gt;%
+  filter(!word1 %in% stop_words$word) %&gt;%
+  filter(!word2 %in% stop_words$word) %&gt;%
+  unite(twogram, word1, word2, sep = &#39; &#39;) %&gt;%              # now putting word1 and word2 back into a single column called twogram
+  group_by(Period) %&gt;%
+  count(twogram, sort=TRUE) %&gt;%
+  slice_max(order_by=n, n = 10)  
+
+nob %&gt;%
+  mutate(twogram = reorder(twogram, n)) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(reorder_within(x = twogram, by = n, within = Period), n, fill = Period)) +
+    geom_col(show.legend = FALSE) +
+  scale_x_reordered() +  
+  coord_flip() +
+    facet_wrap(~Period, ncol = 2, scales = &quot;free&quot;) +
+    ylab(&#39;n&#39;) +
+    xlab(&quot;2-gram&quot;)</code></pre>
+<p><img src="5_SentAndDict_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
+<div id="co-occurance" class="section level2" number="4.2">
+<h2 number="4.2"><span class="header-section-number">4.2</span> Co-occurance</h2>
+<p>Words can also co-occur in the same context even if they are not necessarily right next to each other. To get at this we’ll need more than n-grams. One way to do this is the widyr package, which essentially restructures our tidy data does an operation and the recasts it back into a tidy format.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p>
+<p>For instance, we can use the <code>pairwise_count()</code> function to find all the words that appear together in the same Nobel speech (not necessarily right next to each other).</p>
+<pre class="r"><code>library(widyr)
+nobel %&gt;%
+  unnest_tokens(word, AwardSpeech) %&gt;%
+  filter(!word %in% stop_words$word) %&gt;%
+  pairwise_count(word, Year, sort = TRUE)</code></pre>
+<pre><code>## Warning: `distinct_()` was deprecated in dplyr 0.7.0.
+## Please use `distinct()` instead.
+## See vignette(&#39;programming&#39;) for more help</code></pre>
+<pre><code>## Warning: `tbl_df()` was deprecated in dplyr 1.0.0.
+## Please use `tibble::as_tibble()` instead.</code></pre>
+<pre><code>## # A tibble: 22,374,876 x 3
+##    item1 item2     n
+##    &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt;
+##  1 time  peace    89
+##  2 peace time     89
+##  3 prize peace    86
+##  4 peace prize    86
+##  5 peace nobel    85
+##  6 nobel peace    85
+##  7 war   peace    85
+##  8 world peace    85
+##  9 peace war      85
+## 10 peace world    85
+## # ... with 22,374,866 more rows</code></pre>
+<p>Notice that this is a much larger dataframe – our unnested dataframe minus stopwords was ~93.000 words, this new one is +21 million.</p>
+<p>From here we might do many things using the same skills of subsetting, counting, and plotting we have talked to up to now. We filter for words co-occurring with “evil” and plot the most frequently occurring in the same document as “evil.” We might also note that <code>unnest_tokens()</code> will can also tokenize by sentence. This means that if you wanted to look at co-occurrence within sentences you could tokenize by sentence and give each sentance (which would occupy one row each) an index number (something like <code>mutate(index = row_number())</code> might do the trick) and then call <code>pairwise_count</code>.</p>
+<div id="excercises-1" class="section level3" number="4.2.1">
+<h3 number="4.2.1"><span class="header-section-number">4.2.1</span> Excercises</h3>
+<ul>
+<li>Implement the above suggestion – tokenize by sentence and search for most frequently co-occurring words with keywords of your choice. Try this for either Nobel or SR corpora (NB. The SR dataframe is also structured one page of text per row, thus you could also look for co-occurrence within individual pages of the Sustainability Reports.)</li>
+<li>Find most frequently occurring n-grams (of whatever size n) in the SR corpus. Any surprises?</li>
+</ul>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-clark2018text" class="csl-entry">
+Clark, Michael. 2018. <span>“An Introduction to Text Processing and Analysis with <span>R</span>.”</span> 2018. <a href="https://m-clark.github.io/text-analysis-with-R/">https://m-clark.github.io/text-analysis-with-R/</a>.
+</div>
+<div id="ref-jurafsky2014speech" class="csl-entry">
+Jurafsky, Dan, and James H Martin. forthcoming. <span>“Speech and Language Processing. Vol. 3.”</span> Pearson London London. <a href="http://www.web.stanford.edu/ jurafsky/slp3/">http://www.web.stanford.edu/ jurafsky/slp3/</a>.
+</div>
+<div id="ref-loughran_when_2011" class="csl-entry">
+Loughran, Tim, and Bill Mcdonald. 2011. <span>“When <span>Is</span> a <span>Liability</span> <span>Not</span> a <span>Liability</span>? <span>Textual</span> <span>Analysis</span>, <span>Dictionaries</span>, and 10-<span>Ks</span>.”</span> <em>The Journal of Finance</em> 66 (1): 35–65.
+</div>
+<div id="ref-niekler2020" class="csl-entry">
+Niekler, Andreas, and Gregor Wiedemann. 2020. <span>“Text Mining in <span>R</span> for the Social Sciences and Digital Humanities.”</span> 2020. <a href="https://tm4ss.github.io/docs/index.html">https://tm4ss.github.io/docs/index.html</a>.
+</div>
+<div id="ref-schweinberger2021pos" class="csl-entry">
+Schweinberger, Martin. 2021. <span>“POS-Tagging and Syntactic Parsing with <span>R</span>.”</span> 2021. <a href="https://slcladal.github.io/tagging.html#2_POS-Tagging_with_openNLP">https://slcladal.github.io/tagging.html#2_POS-Tagging_with_openNLP</a>.
+</div>
+<div id="ref-wickham2016r" class="csl-entry">
+Wickham, Hadley, and Garrett Grolemund. 2016. <em><span>R</span> for Data Science: Import, Tidy, Transform, Visualize, and Model Data</em>. " O’Reilly Media, Inc.". <a href="https://r4ds.had.co.nz/index.html">https://r4ds.had.co.nz/index.html</a>.
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Based on examples from <span class="citation">Clark (2018)</span>, <span class="citation">Schweinberger (2021)</span>, and especially <span class="citation">Niekler and Wiedemann (2020)</span>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>these are English-language, it should be said. There are many for other languages out there, see <a href="https://github.com/ltgoslo/norsentlex">here</a> for an extensive Norwegian positive/negative sentiment dictionary. Some of these will involve a little wrangling of the data to read into R and get them into tidy format.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>For some discussion of the nrc lexicon and more background on sentiment analysis, see chapter 20 in <span class="citation">Jurafsky and Martin (forthcoming)</span>. One of the earliest and best known sentiment dictionaries is the <a href="http://www.wjh.harvard.edu/~inquirer/spreadsheet_guide.htm">General Inquirer</a>.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>See chapter 13 in <span class="citation">Wickham and Grolemund (2016)</span> for great visualizations of joins and translation into R commands.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>There are simple statistics to test the correlation between words in the same document (phi-test – in widyr as <code>pairwise_corr</code>), statistics to measure differences in word use between documents (log-likelihood, chi-squared, keyness), and so on. These are a bit much to cover in a two day workshop but area all fairly easy to implement in R and you can easily find tutorials and explainers that will help you do this.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+
+<br><br><p>2021. <a href="mailto: gregory.fergusoncradler@inn.no">gregory.fergusoncradler@inn.no</a></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

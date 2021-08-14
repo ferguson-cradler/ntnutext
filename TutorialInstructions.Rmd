@@ -1,0 +1,53 @@
+---
+title: "Instructions of pre-workshop R tutorial"
+subtitle: "NTNU, Trondheim"
+date: "August 12-13, 2021"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+---
+
+To really hit the ground running and get the most possible out of our two-day workshop, I hope that as many participants as possible will be able to install some software (all free) on your computer and walk through a very basic tutorial on coding in R. The tutorials are broken up into units that should take between 10-20 minutes each and all told I’d guess these will keep you busy for 3 hours or so. They’re small enough that hopefully you won’t have trouble fitting them into your schedule, perhaps when you’re looking for ways to productively procrastinate on other things you’re supposed to be working on:). 
+
+# Install R and Rstudio. 
+
+Follow steps 1 and 2 at https://swirlstats.com/students.html. 
+
+#Install swirl and two tutorials. 
+
+Go to the same page (https://swirlstats.com/students.html), install swirl (which is step 3 on the webpage). Once you’ve installed swirl (i.e., what you did by typing: install.packages("swirl") in R, install two tutorials we’ll be doing parts of by typing and pressing enter (one time for each):
+```{r, eval=FALSE}
+swirl::install_course("R Programming")
+swirl::install_course("Regular Expressions")
+```
+[The above window indicates what to enter into the R console in the lower left-hand window of RStudio]
+
+Now you can open swirl by entering: 
+```{r, eval=FALSE}
+library("swirl")
+swirl()
+```
+(You only have to type the first line once per R session – ie, if you exit swirl but don’t close Rstudio, you can enter swirl again by typing: swirl(). If you close Rstudio, you’ll need to repeat the first line as well (which loads the package). 
+
+# Work through two short tutorials 
+
+Open swirl (via the two lines above) and swirl will talk to you and tell you what to do in the console window in the lower left hand corner of Rstudio. It’s built for beginners so it should be straight forward to use. Of the two tutorials we installed, start with “R Programming” and do lessons 1-9, 12, and 14. I’d actually recommend all of them except Simulation (#13), which we won’t be doing, and Base Graphics (#15), which we won’t be using. It would be great if you could do all of “Regular Expressions” (it’s short and regular expressions are probably the most important thing to learn before you start working with text analysis on computers). 
+
+[For those who prefer textbooks there is an excellent one online at https://r4ds.had.co.nz/index.html. Chapters 1-20 cover roughly the same material as the swirl tutorials but more and much more in depth. They take a lot longer than a couple of hours to go through and I didn’t think it fair to take up that much of your time but if you’re interested and want to do more, that’s where I’d start.] 
+
+# Install packages 
+
+We will need: tidyverse, tidytext, quanteda, stm, SnowballC, syuzhet, and readtext. To do this you will simply type at the R console prompt: 
+
+```{r, eval=FALSE}
+install.packages("NAME_OF_PACKAGE")
+## So, for instance, to install the first package listed above you’ll type: 
+install.packages("tidyverse")
+```
+
+# Prepare own documents 
+
+If you’d like, you can prepare a handful of documents you’d like to play around with. We will be doing a lot of hands on work and I’ll have sample documents for us to use. I’m going to schedule in some time for you individually to test out these methods and experiment. If you have documents of your own you're welcome to use these. They can be in electronic form of any sort, though preferably already machine readable (ie you can highlight the document's text on your computer). We'll talk about and do some examples of OCR (optical character recognition where you turn photos of text into computer text) but these take a long time to crunch. To prepare for this, have the documents you’d like to work with in a specific folder on the laptop you’ll have at the workshop (or, of course, on the cloud accessible via laptop at the workshop). It will also help if you put metadata in the filenames in a consistent manner such as, for instance: Tolstoy-War and Peace-1869.pdf.

@@ -1,0 +1,102 @@
+---
+title: "Session 8: Word embedding"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+bibliography: textanalysis.bib
+---
+
+# Model training
+
+This tutorial follows the vignettes written by Ben Schmidt to illustrate his ``wordVectors`` package. See the [introductary](https://github.com/bmschmidt/wordVectors/blob/master/vignettes/introduction.Rmd) and [exploration](https://github.com/bmschmidt/wordVectors/blob/master/vignettes/exploration.Rmd) vignettes. See, too, his longer blog [post](http://bookworm.benschmidt.org/posts/2015-10-25-Word-Embeddings.html) on vector space models for the humanities 
+
+This tutorial walks through training the model on our Nobel corpus which is a _very_ small corpus for word embedding. This is done more as a demonstration of the ``wordVectors`` package than as something likely to give us valuable insight. First we write our Nobel corpus to a text file and save it to our current directory, then we instruct ``wordVectors`` to prep this file by tokenizing it, changing all upper cases to lower (we've already done this but the package doesn't know that) and looking for commonly occurring bigrams. Then we train the model, which requires it write to another file in so doing, which we duly indicate.
+
+```{r, message = FALSE, warning = FALSE, error=FALSE, results = 'hide'}
+library(wordVectors)
+library(magrittr)
+library(tidyverse)
+nobel <- read_rds("data/nobel_cleaned.Rds")
+write_lines(nobel$AwardSpeech, "nobel.txt")
+prep_word2vec(origin="nobel.txt",destination="nobel_prep.txt",lowercase=T,bundle_ngrams=2)
+model <- train_word2vec("nobel_prep.txt","nobel_vectors.bin", vectors = 200, threads = 4 , window = 10, iter = 5, negative_samples = 10, force = TRUE)
+```
+
+# Vector operations
+
+With our model trained, the most obvious thing to do is to look at individual words and see which other words are closest to them in terms of cosine similarity.
+
+```{r}
+model %>% closest_to("peace", n = 15)
+```
+
+``closest_to`` allows for easy vector addition and subtraction. We can, for example, try the classic (and perhaps a bit tired) example:
+
+```{r}
+model %>% closest_to(~"king"+"woman"-"man")
+```
+
+Well that didn't work! But we shouldn't really be surprised, we're using a tiny corpus and one not likely to be talking too much about kings or queens. More meaningful for this sort of corpus might be:
+
+```{r}
+
+model %>% closest_to(~"nuclear" + "peace")
+model %>% closest_to(~"nuclear" - "peace")
+```
+
+A rough approximation of @kozlowski2019geometry might be to construct a "cultural" vector (we'll just use one binary pair and take the difference rather than averaging over multiple pairs) and then measuring cosine similarity to other words -- ie to what extent they point in the direct of our vector (in the direction of "peace") or towards "violence" (which will be a negative number, the lower the more similar). 
+
+```{r}
+peace <- model[rownames(model) == "peace"]
+violence <- model[rownames(model) == "violence"]
+pv_spectrum <- peace-violence
+cosineSimilarity(pv_spectrum, model[["treaty"]])
+cosineSimilarity(pv_spectrum, model[["armistice"]])
+cosineSimilarity(pv_spectrum, model[["violation"]])
+cosineSimilarity(pv_spectrum, model[["aggression"]])
+cosineSimilarity(pv_spectrum, model[["war"]])
+```
+
+All told and for such a small corpus, this seems not half bad.
+
+# Plotting
+
+We might also try to plot this cultural axis using two binary opposite word pairs and then see where other words land in similarity to the difference between the binaries (similar to what we did above). In order to subset our total corpus, we'll plot the 200 words most similar to "politics".
+
+```{r, message=FALSE, warning=FALSE}
+violation <- model %>% 
+  closest_to(~ "violation"-"rights",n=Inf) 
+war <- model %>% 
+  closest_to(~ "war" - "peace", n=Inf)
+politics <- model %>%
+  closest_to("politics", n = 200)
+
+library(ggplot2)
+library(dplyr)
+politics %>%
+  inner_join(violation) %>%
+  inner_join(war) %>%
+  ggplot() + 
+  geom_text(aes(x=`similarity to "violation" - "rights"`,
+                y=`similarity to "war" - "peace"`,
+                label=word))
+```
+
+``wordVectors`` includes multiple nice plotting features. One is via principle component analysis, which reduces many dimensions to a smaller number (here 2) based on the two most informative dimensions running through the original many-dimensional space. Here we'll try to compare words grouped around "peace". 
+
+```{r}
+peacewords <- model %>% closest_to("peace", n = 50)
+peace = model[[peacewords$word,average=F]]
+plot(peace,method="pca")
+```
+
+Or we can use t-sne, another dimension reduction method to project our word vectors onto two-dimensional space. 
+
+```{r, message=FALSE, warning=FALSE}
+plot(model,perplexity=50)
+```
+
+This definitely shows words that tend to show up together. Perhaps some interesting things here, though historians are probably likely to find graphs like this most interesting compared over time.
